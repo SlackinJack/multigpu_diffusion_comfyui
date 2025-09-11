@@ -109,7 +109,6 @@ def close_host_process(reason):
     if host_process is not None:
         print(f'Stopping host process: {reason}')
         tries = 0
-        host_pid = host_process.pid
         host = psutil.Process(host_process.pid)
         workers = [host] + host.children(recursive=True)
         while True:
@@ -144,6 +143,7 @@ def close_host_process(reason):
 def get_result(data, bar):
     global host_address_generate, host_address_progress, last_config
     run = True
+
     def get_progress():
         while True:
             nonlocal bar, run
@@ -157,13 +157,14 @@ def get_result(data, bar):
                 time.sleep(5)
             else:
                 return
+
     prog_thread = threading.Thread(target=get_progress)
     prog_thread.start()
 
     try:
         response = requests.post(host_address_generate, json=data)
-    except:
-        assert False, "Could not post request to host.\nCheck console for details."
+    except Exception as e:
+        assert False, f"Could not post request to host.\nCheck console for details.\n\n{str(e)}"
 
     run = False
     bar.update_absolute(100)
@@ -177,8 +178,8 @@ def get_result(data, bar):
         if last_config is not None and not last_config["keepalive"]:
             close_host_process("Keepalive option off")
         return output_base64
-    except:
+    except Exception as e:
         run = False
         close_host_process("Unknown error")
-        assert False, "An error occurred while generating image.\nCheck console for details."
+        assert False, f"An error occurred while generating image.\nCheck console for details.\n\n{str(e)}"
 
