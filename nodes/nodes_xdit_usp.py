@@ -31,7 +31,7 @@ XDIT_USP_CONFIGS_OPTIONAL = {
 }
 
 
-class xDiTUSPPipelineConfig:
+class xDiTUSPConfig:
     @classmethod
     def INPUT_TYPES(s):
         global XDIT_USP_CONFIGS, XDIT_USP_CONFIGS_OPTIONAL

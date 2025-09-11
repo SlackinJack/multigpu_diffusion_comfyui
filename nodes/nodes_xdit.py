@@ -35,7 +35,7 @@ XDIT_CONFIGS_OPTIONAL = {
 }
 
 
-class xDiTPipelineConfig:
+class xDiTConfig:
     @classmethod
     def INPUT_TYPES(s):
         global XDIT_CONFIGS, XDIT_CONFIGS_OPTIONAL

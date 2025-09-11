@@ -32,7 +32,7 @@ DISTRIFUSER_CONFIGS_OPTIONAL = {
 }
 
 
-class DistrifuserPipelineConfig:
+class DistrifuserConfig:
     @classmethod
     def INPUT_TYPES(s):
         global DISTRIFUSER_CONFIGS, DISTRIFUSER_CONFIGS_OPTIONAL

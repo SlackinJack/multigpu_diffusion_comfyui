@@ -19,20 +19,20 @@ NODE_CLASS_MAPPINGS = {
     "IPAdapterSelector":            IPAdapterSelector,
     "EncodePromptWithCompel":       EncodePromptWithCompel,
 
-    "PipelineConfig":               PipelineConfig,
+    "HostConfig":                   HostConfig,
 
-    "AsyncDiffPipelineConfig":      AsyncDiffPipelineConfig,
+    "AsyncDiffConfig":              AsyncDiffConfig,
     "AsyncDiffADSampler":           AsyncDiffADSampler,
     "AsyncDiffSDSampler":           AsyncDiffSDSampler,
     "AsyncDiffSDUpscaleSampler":    AsyncDiffSDUpscaleSampler,
     "AsyncDiffSVDSampler":          AsyncDiffSVDSampler,
 
-    "DistrifuserPipelineConfig":    DistrifuserPipelineConfig,
+    "DistrifuserConfig":            DistrifuserConfig,
     "DistrifuserSDSampler":         DistrifuserSDSampler,
 
-    "xDiTPipelineConfig":           xDiTPipelineConfig,
-    "xDiTSampler":             xDiTSampler,
-    "xDiTUSPPipelineConfig":        xDiTUSPPipelineConfig,
+    "xDiTConfig":                   xDiTConfig,
+    "xDiTSampler":                  xDiTSampler,
+    "xDiTUSPConfig":                xDiTUSPConfig,
     "xDiTUSPImageSampler":          xDiTUSPImageSampler,
     "xDiTUSPVideoSampler":          xDiTUSPVideoSampler,
 }
@@ -52,20 +52,20 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "IPAdapterSelector":            "IPAdapterSelector",
     "EncodePromptWithCompel":       "EncodePromptWithCompel",
 
-    "PipelineConfig":               "PipelineConfig",
+    "HostConfig":                   "HostConfig",
 
-    "AsyncDiffPipelineConfig":      "AsyncDiffPipelineConfig",
+    "AsyncDiffConfig":              "AsyncDiffConfig",
     "AsyncDiffADSampler":           "AsyncDiffADSampler",
     "AsyncDiffSDSampler":           "AsyncDiffSDSampler",
     "AsyncDiffSDUpscaleSampler":    "AsyncDiffSDUpscaleSampler",
     "AsyncDiffSVDSampler":          "AsyncDiffSVDSampler",
 
-    "DistrifuserPipelineConfig":    "DistrifuserPipelineConfig",
+    "DistrifuserConfig":            "DistrifuserConfig",
     "DistrifuserSDSampler":         "DistrifuserSDSampler",
 
-    "xDiTPipelineConfig":           "xDiTPipelineConfig",
+    "xDiTConfig":                   "xDiTConfig",
     "xDiTSampler":                  "xDiTSampler",
-    "xDiTUSPPipelineConfig":        "xDiTUSPPipelineConfig",
+    "xDiTUSPConfig":                "xDiTUSPConfig",
     "xDiTUSPImageSampler":          "xDiTUSPImageSampler",
     "xDiTUSPVideoSampler":          "xDiTUSPVideoSampler",
 }

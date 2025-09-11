@@ -10,7 +10,7 @@ from ..multigpu_diffusion.modules.utils import *
 from .globals import *
 
 
-class PipelineConfig:
+class HostConfig:
     @classmethod
     def INPUT_TYPES(s):
         global GENERIC_CONFIGS, GENERIC_CONFIGS_COMFY, GENERIC_CONFIGS_OPTIONAL

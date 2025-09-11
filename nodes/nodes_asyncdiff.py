@@ -31,7 +31,7 @@ ASYNCDIFF_CONFIGS_OPTIONAL = {
 }
 
 
-class AsyncDiffPipelineConfig:
+class AsyncDiffConfig:
     @classmethod
     def INPUT_TYPES(s):
         global ASYNCDIFF_CONFIGS
