@@ -35,53 +35,58 @@ last_config             = None
 
 def launch_host(config, backend, bar):
     global cwd, MASTER_PORT, PORT, host_process, host_process_backend, last_config
+    closed = False
     if host_process_backend != backend:
         close_host_process("Backend changed")
-    elif host_process is not None and last_config is not None:
+        closed = True
+    if not closed and (host_process is not None and last_config is not None):
         for k, v in last_config.items():
             if k not in config:
                 close_host_process("Updated configuration")
+                closed = True
                 break
             elif config[k] != v:
                 close_host_process("Updated configuration")
+                closed = True
                 break
-    elif host_process is None or last_config is None or len(host_process_backend) == 0:
+    if not closed and (host_process is None or last_config is None or len(host_process_backend) == 0):
         close_host_process("Host not set correctly")
-    elif host_process is not None and last_config is not None and len(host_process_backend) > 0:
+        closed = True
+
+    if not closed:
         bar.update_absolute(33)
-        return
+    else:
+        nproc_per_node = config.pop("nproc_per_node")
+        cmd = [
+            "torchrun",
+            f'--nproc_per_node={nproc_per_node}',
+            f'--master-port={MASTER_PORT}',
+            f'{cwd}/../multigpu_diffusion/host_{backend}.py',
+            f'--port={PORT}'
+        ]
 
-    nproc_per_node = config.pop("nproc_per_node")
-    cmd = [
-        "torchrun",
-        f'--nproc_per_node={nproc_per_node}',
-        f'--master-port={MASTER_PORT}',
-        f'{cwd}/../multigpu_diffusion/host_{backend}.py',
-        f'--port={PORT}'
-    ]
-
-    for k, v in config.items():
-        if k in GENERIC_CONFIGS_COMFY.keys(): continue
-        if k in ["lora", "control_net", "ip_adapter", "motion_adapter_lora"]:
-            cmd.append(f'--{k}={json.dumps(v)}')
-        else:
-            v = str(v)
-            if v == "True":
-                cmd.append(f'--{k}')
+        for k, v in config.items():
+            if k in GENERIC_CONFIGS_COMFY.keys(): continue
+            if k in ["lora", "control_net", "ip_adapter", "motion_adapter_lora"]:
+                cmd.append(f'--{k}={json.dumps(v)}')
             else:
-                if v == "False": continue
-                if k == "quantize_to" and v == "disabled": continue
-                cmd.append(f'--{k}={str(v)}')
+                v = str(v)
+                if v == "True":
+                    cmd.append(f'--{k}')
+                else:
+                    if v == "False": continue
+                    if k == "quantize_to" and v == "disabled": continue
+                    cmd.append(f'--{k}={str(v)}')
 
-    # launch host
-    cmd_str = ""
-    for c in cmd: cmd_str += '\n' + c
-    print(f'Starting host:{str(cmd_str)}')
-    host_process = subprocess.Popen(cmd)
-    last_config = config
-    host_process_backend = backend
-    check_host_process(config.get("pipeline_init_timeout"), bar)
-    bar.update_absolute(33)
+        # launch host
+        cmd_str = ""
+        for c in cmd: cmd_str += '\n' + c
+        print(f'Starting host:{str(cmd_str)}')
+        host_process = subprocess.Popen(cmd)
+        last_config = config
+        host_process_backend = backend
+        check_host_process(config.get("pipeline_init_timeout"), bar)
+        bar.update_absolute(33)
     return
 
 
@@ -108,15 +113,15 @@ def close_host_process(reason):
     global host_process, last_config, host_process_backend, PORT
     if host_process is not None:
         print(f'Stopping host process: {reason}')
-        tries = 0
         host = psutil.Process(host_process.pid)
         workers = [host] + host.children(recursive=True)
         while True:
-            tries += 1
             for w in workers:
                 try:
-                    if tries > 5:   w.kill()
-                    else:           w.terminate()
+                    print(f'Stopping PID: {w.pid}')
+                    w.terminate()
+                    time.sleep(3)
+                    w.kill()    
                 except:
                     pass
             try:

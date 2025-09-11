@@ -36,13 +36,13 @@ class SchedulerSelector:
     def get(self, scheduler, karras): return ((scheduler if not karras else "k_" + scheduler),)
 
 
-class ModelSelector:
+class CheckpointSelector:
     @classmethod
-    def INPUT_TYPES(s): return { "required": { "model": MODEL_LIST } }
-    RETURN_TYPES    = MODEL
+    def INPUT_TYPES(s): return { "required": { "checkpoint": CHECKPOINT_LIST } }
+    RETURN_TYPES    = CHECKPOINT
     FUNCTION        = "get"
     CATEGORY        = ROOT_CATEGORY_GENERAL
-    def get(self, model): return (f"{checkpoints_dir}/{model}",)
+    def get(self, checkpoint): return (f"{checkpoints_dir}/{checkpoint}",)
 
 
 class VAESelector:
@@ -142,9 +142,9 @@ class EncodePromptWithCompel:
     @classmethod
     def INPUT_TYPES(s): return {
         "required": {
-            "model":            MODEL,
-            "model_type":       COMPEL_MODEL_LIST,
-            "prompt":           PROMPT,
+            "checkpoint":   CHECKPOINT,
+            "model_type":   COMPEL_MODEL_LIST,
+            "prompt":       PROMPT,
         }
     }
 
@@ -152,7 +152,7 @@ class EncodePromptWithCompel:
     FUNCTION        = "encode"
     CATEGORY        = ROOT_CATEGORY_TOOLS
 
-    def encode(self, model, model_type, prompt):
+    def encode(self, checkpoint, model_type, prompt):
         torch_dtype = torch.float32
 
         if model_type in ["sd1", "sd2"]:
@@ -163,7 +163,7 @@ class EncodePromptWithCompel:
             embeddings_type = ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED
 
         pipe = pipeline_class.from_pretrained(
-            pretrained_model_name_or_path=model,
+            pretrained_model_name_or_path=checkpoint,
             use_safetensors=True,
             local_files_only=True,
         ).to("cpu")

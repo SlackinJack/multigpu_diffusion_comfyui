@@ -18,11 +18,11 @@ from ..multigpu_diffusion.modules.utils import *
 
 
 XDIT_USP_CONFIGS = {
-    "model":                        MODEL,
-    "type":                         XDIT_USP_MODEL_LIST,
-    "nproc_per_node":               NPROC_PER_NODE,
-    "ulysses_degree":               ULYSSES_DEGREE,
-    "ring_degree":                  RING_DEGREE,
+    "checkpoint":       CHECKPOINT,
+    "type":             XDIT_USP_MODEL_LIST,
+    "nproc_per_node":   NPROC_PER_NODE,
+    "ulysses_degree":   ULYSSES_DEGREE,
+    "ring_degree":      RING_DEGREE,
 }
 
 
@@ -48,7 +48,7 @@ class xDiTUSPImageSampler:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "config":           GENERIC_CONFIG,
+                "host_config":      GENERIC_CONFIG,
                 "xdit_usp_config":  XDIT_USP_CONFIG,
                 "positive_prompt":  PROMPT,
                 "negative_prompt":  PROMPT,
@@ -67,7 +67,7 @@ class xDiTUSPImageSampler:
 
     def generate(
         self,
-        config,
+        host_config,
         xdit_usp_config,
         positive_prompt,
         negative_prompt,
@@ -79,8 +79,8 @@ class xDiTUSPImageSampler:
         assert (len(positive_prompt) > 0), "You must provide a prompt."
 
         bar = ProgressBar(100)
-        config.update(xdit_usp_config)
-        launch_host(config, "xdit_usp", bar)
+        host_config.update(xdit_usp_config)
+        launch_host(host_config, "xdit_usp", bar)
 
         data = {
             "steps": steps,
@@ -106,7 +106,7 @@ class xDiTUSPVideoSampler:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "config":           GENERIC_CONFIG,
+                "host_config":      GENERIC_CONFIG,
                 "xdit_usp_config":  XDIT_USP_CONFIG,
                 "positive_prompt":  PROMPT,
                 "negative_prompt":  PROMPT,
@@ -126,7 +126,7 @@ class xDiTUSPVideoSampler:
 
     def generate(
         self,
-        config,
+        host_config,
         xdit_usp_config,
         positive_prompt,
         negative_prompt,
@@ -139,8 +139,8 @@ class xDiTUSPVideoSampler:
         assert (len(positive_prompt) > 0), "You must provide a prompt."
 
         bar = ProgressBar(100)
-        config.update(xdit_usp_config)
-        launch_host(config, "xdit_usp", bar)
+        host_config.update(xdit_usp_config)
+        launch_host(host_config, "xdit_usp", bar)
 
         data = {
             "steps":    steps,

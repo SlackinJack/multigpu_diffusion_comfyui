@@ -18,7 +18,7 @@ from ..multigpu_diffusion.modules.utils import *
 
 
 ASYNCDIFF_CONFIGS = {
-    "model":            MODEL,
+    "checkpoint":       CHECKPOINT,
     "type":             ASYNCDIFF_MODEL_LIST,
     "nproc_per_node":   NPROC_PER_NODE,
     "model_n":          MODEL_N,
@@ -48,7 +48,7 @@ class AsyncDiffADSampler:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "config":               GENERIC_CONFIG,
+                "host_config":          GENERIC_CONFIG,
                 "asyncdiff_config":     ASYNCDIFF_CONFIG,
                 "positive_prompt":      PROMPT,
                 "seed":                 SEED,
@@ -71,7 +71,7 @@ class AsyncDiffADSampler:
 
     def generate(
         self,
-        config,
+        host_config,
         asyncdiff_config,
         positive_prompt,
         seed,
@@ -84,13 +84,13 @@ class AsyncDiffADSampler:
         control_image=None,
         control_image_scale=None,
     ):
-        assert (config.get("motion_module") is not None) or (config.get("motion_adapter") is not None), "Either a motion module or a motion adapter must be set."
-        assert (config.get("motion_module") is None) or (config.get("motion_adapter") is None), "Only one motion module or motion adapter must be set."
+        assert (host_config.get("motion_module") is not None) or (host_config.get("motion_adapter") is not None), "Either a motion module or a motion adapter must be set."
+        assert (host_config.get("motion_module") is None) or (host_config.get("motion_adapter") is None), "Only one motion module or motion adapter must be set."
         assert (len(positive_prompt) > 0), "You must provide a prompt."
 
         bar = ProgressBar(100)
-        config.update(asyncdiff_config)
-        launch_host(config, "asyncdiff", bar)
+        host_config.update(asyncdiff_config)
+        launch_host(host_config, "asyncdiff", bar)
 
         data = {
             "positive": positive_prompt,
@@ -102,12 +102,12 @@ class AsyncDiffADSampler:
 
         if negative_prompt is not None: data["negative"] = negative_prompt
 
-        if ip_image is not None and config.get("ip_adapter"):
+        if ip_image is not None and host_config.get("ip_adapter"):
             ip_image = ip_image.squeeze(0)              # NHWC -> HWC
             data["ip_image"] = convert_tensor_to_b64(ip_image)
             data["ip_image_scale"] = ip_image_scale,
 
-        if control_image is not None and config.get("control_net"):
+        if control_image is not None and host_config.get("control_net"):
             control_image = control_image.squeeze(0)    # NHWC -> HWC
             data["control_image"] = convert_tensor_to_b64(control_image)
             data["control_image_scale"] = image_scale,
@@ -130,7 +130,7 @@ class AsyncDiffSDSampler:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "config":               GENERIC_CONFIG,
+                "host_config":          GENERIC_CONFIG,
                 "asyncdiff_config":     ASYNCDIFF_CONFIG,
                 "seed":                 SEED,
                 "steps":                STEPS,
@@ -156,7 +156,7 @@ class AsyncDiffSDSampler:
 
     def generate(
         self,
-        config,
+        host_config,
         asyncdiff_config,
         seed,
         steps,
@@ -179,8 +179,8 @@ class AsyncDiffSDSampler:
             assert (negative_embeds is None), "Provide a negative prompt or a negative embedding, but not both."
 
         bar = ProgressBar(100)
-        config.update(asyncdiff_config)
-        launch_host(config, "asyncdiff", bar)
+        host_config.update(asyncdiff_config)
+        launch_host(host_config, "asyncdiff", bar)
 
         data = {
             "seed":         seed,
@@ -194,11 +194,11 @@ class AsyncDiffSDSampler:
         if positive_embeds is not None: data["positive_embeds"] = pickle_and_encode_b64(positive_embeds)
         if negative_embeds is not None: data["negative_embeds"] = pickle_and_encode_b64(negative_embeds)
         if latent is not None:          data["latent"] = pickle_and_encode_b64(latent["samples"])
-        if ip_image is not None and config.get("ip_adapter") is not None:
+        if ip_image is not None and host_config.get("ip_adapter") is not None:
             ip_image = ip_image.squeeze(0)              # NHWC -> HWC
             data["ip_image"] = convert_tensor_to_b64(ip_image)
             data["ip_image_scale"] = ip_image_scale
-        if control_image is not None and config.get("control_net") is not None:
+        if control_image is not None and host_config.get("control_net") is not None:
             control_image = control_image.squeeze(0)    # NHWC -> HWC
             data["control_image"] = convert_tensor_to_b64(control_image)
             data["control_image_scale"] = control_image_scale
@@ -217,7 +217,7 @@ class AsyncDiffSVDSampler:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "config":               GENERIC_CONFIG,
+                "host_config":          GENERIC_CONFIG,
                 "asyncdiff_config":     ASYNCDIFF_CONFIG,
                 "image":                IMAGE,
                 "image_scale":          SCALE_PERCENTAGE,
@@ -236,7 +236,7 @@ class AsyncDiffSVDSampler:
 
     def generate(
         self,
-        config,
+        host_config,
         asyncdiff_config,
         image,
         image_scale,
@@ -250,8 +250,8 @@ class AsyncDiffSVDSampler:
         assert (image is not None), "You must provide an image."
 
         bar = ProgressBar(100)
-        config.update(asyncdiff_config)
-        launch_host(config, "asyncdiff", bar)
+        host_config.update(asyncdiff_config)
+        launch_host(host_config, "asyncdiff", bar)
 
         image = image.squeeze(0)                    # NHWC -> HWC
         b64_image = convert_tensor_to_b64(image)
@@ -283,7 +283,7 @@ class AsyncDiffSDUpscaleSampler:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "config":           GENERIC_CONFIG,
+                "host_config":      GENERIC_CONFIG,
                 "asyncdiff_config": ASYNCDIFF_CONFIG,
                 "image":            IMAGE,
                 "image_scale":      SCALE_PERCENTAGE,
@@ -303,7 +303,7 @@ class AsyncDiffSDUpscaleSampler:
 
     def generate(
         self,
-        config,
+        host_config,
         asyncdiff_config,
         image,
         image_scale,
@@ -316,8 +316,8 @@ class AsyncDiffSDUpscaleSampler:
         assert (len(positive_prompt) > 0), "You must provide a prompt."
 
         bar = ProgressBar(100)
-        config.update(asyncdiff_config)
-        launch_host(config, "asyncdiff", bar)
+        host_config.update(asyncdiff_config)
+        launch_host(host_config, "asyncdiff", bar)
 
         if image.size(0) > 1:   images = list(torch.unbind(image, 0))   # NHWC -> [HWC], len == N
         else:                   images = [image.squeeze(0)]             # NHWC -> [HWC], len == 1

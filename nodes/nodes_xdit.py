@@ -18,7 +18,7 @@ from ..multigpu_diffusion.modules.utils import *
 
 
 XDIT_CONFIGS = {
-    "model":                        MODEL,
+    "checkpoint":                   CHECKPOINT,
     "type":                         XDIT_MODEL_LIST,
     "nproc_per_node":               NPROC_PER_NODE,
     "pipefusion_parallel_degree":   PIPEFUSION_PARALLEL_DEGREE,
@@ -52,7 +52,7 @@ class xDiTSampler:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "config":           GENERIC_CONFIG,
+                "host_config":      GENERIC_CONFIG,
                 "xdit_config":      XDIT_CONFIG,
                 "seed":             SEED,
                 "steps":            STEPS,
@@ -76,7 +76,7 @@ class xDiTSampler:
 
     def generate(
         self,
-        config,
+        host_config,
         xdit_config,
         seed,
         steps,
@@ -97,8 +97,8 @@ class xDiTSampler:
             assert (negative_embeds is None), "Provide a negative prompt or a negative embedding, but not both."
 
         bar = ProgressBar(100)
-        config.update(xdit_config)
-        launch_host(config, "xdit", bar)
+        host_config.update(xdit_config)
+        launch_host(host_config, "xdit", bar)
 
         data = {
             "steps": steps,
@@ -113,7 +113,7 @@ class xDiTSampler:
         if negative_embeds is not None: data["negative_embeds"] = pickle_and_encode_b64(negative_embeds)
         if latent is not None:          data["latent"] = pickle_and_encode_b64(latent["samples"])
 
-        if ip_image is not None and config.get("ip_adapter"):
+        if ip_image is not None and host_config.get("ip_adapter"):
             ip_image = ip_image.squeeze(0)  # NHWC -> HWC
             data["ip_image"] = convert_tensor_to_b64(ip_image)
             data["ip_image_scale"] = ip_image_scale

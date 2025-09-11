@@ -7,7 +7,7 @@ from .nodes.nodes_xdit_usp import *
 
 NODE_CLASS_MAPPINGS = {
     "GGUFSelector":                 GGUFSelector,
-    "ModelSelector":                ModelSelector,
+    "CheckpointSelector":           CheckpointSelector,
     "SchedulerSelector":            SchedulerSelector,
     "LoraSelector":                 LoraSelector,
     "MultiLoraJoiner":              MultiLoraJoiner,
@@ -40,7 +40,7 @@ NODE_CLASS_MAPPINGS = {
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "GGUFSelector":                 "GGUFSelector",
-    "ModelSelector":                "ModelSelector",
+    "CheckpointSelector":           "CheckpointSelector",
     "SchedulerSelector":            "SchedulerSelector",
     "LoraSelector":                 "LoraSelector",
     "MultiLoraJoiner":              "MultiLoraJoiner",
