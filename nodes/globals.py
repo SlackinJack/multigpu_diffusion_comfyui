@@ -57,13 +57,24 @@ MOTION_ADAPTER                  = ("MD_MOTION_ADAPTER",)
 MOTION_ADAPTER_LORA             = ("MD_MOTION_ADAPTER_LORA",)
 MOTION_ADAPTER_LIST             = (motion_adapters,)
 SCHEDULER                       = ("MD_SCHEDULER",)
-SCHEDULER_LIST                  = (["ddim", "euler",
-                                    "euler_a", "dpm_2",
-                                    "dpm_2_a", "dpmpp_2m",
+SCHEDULER_LIST                  = ([
+                                    "dpmpp_2m",
                                     "dpmpp_2m_sde",
                                     "dpmpp_sde",
-                                    "heun", "lms",
-                                    "pndm", "unipc"],                   { "default": "ddim" })
+                                    "dpm_2",
+                                    "dpm_2_a",
+                                    "euler",
+                                    "euler_a",
+                                    "heun",
+                                    "lms",
+                                    "ddim",
+                                    "deis",
+                                    "dpm_sde",
+                                    "pndm",
+                                    "tcd",
+                                    "unipc"
+                                ],                   { "default": "ddim" })
+TIMESTEP_LIST                   = (["default", "linspace", "trailing"], { "default": "default" })
 VARIANT                         = (["bf16", "fp16", "fp32"],            { "default": "fp16" })
 QUANT                           = (["disabled", "float8",
                                     "int8", "int4", "int2"],            { "default": "disabled" })
@@ -74,6 +85,7 @@ RESOLUTION                      = ("INT",                               { "defau
 SEED                            = ("INT",                               { "default": 0,         "min": 0,           "max": INT_MAX,     "step": 1 })
 STEPS                           = ("INT",                               { "default": 60,        "min": 1,           "max": INT_MAX,     "step": 1 })
 CLIP_SKIP                       = ("INT",                               { "default": 0,         "min": 0,           "max": INT_MAX,     "step": 1 })
+DENOISING_START                 = ("FLOAT",                             { "default": 0.0,       "min": 0,           "max": 1,           "step": 0.01 })
 DECODE_CHUNK_SIZE               = ("INT",                               { "default": 8,         "min": 1,           "max": INT_MAX,     "step": 1 })
 NUM_FRAMES                      = ("INT",                               { "default": 25,        "min": 1,           "max": INT_MAX,     "step": 1 })
 MOTION_BUCKET_ID                = ("INT",                               { "default": 180,       "min": 1,           "max": INT_MAX,     "step": 1 })
@@ -84,6 +96,10 @@ NOISE_AUG_STRENGTH              = ("FLOAT",                             { "defau
 LORA_WEIGHT                     = ("FLOAT",                             { "default": 1.00,      "min": INT_MIN,     "max": INT_MAX,     "step": 0.01 })
 CONTROLNET_SCALE                = ("FLOAT",                             { "default": 1.00,      "min": INT_MIN,     "max": INT_MAX,     "step": 0.01 })
 IP_ADAPTER_SCALE                = ("FLOAT",                             { "default": 1.00,      "min": INT_MIN,     "max": INT_MAX,     "step": 0.01 })
+
+PORT                            = ("INT",                               { "default": 6000,      "min": 1025,        "max": 65535,       "step": 1 })
+MASTER_PORT                     = ("INT",                               { "default": 29400,     "min": 1025,        "max": 65535,       "step": 1 })
+
 
 
 COMPEL_MODEL_LIST               = (["sd1", "sd2", "sdxl"],              { "default": "sdxl" })
@@ -127,6 +143,8 @@ XDIT_CATEGORY           = f"{ROOT_CATEGORY_SAMPLERS}/xDiT"
 
 
 GENERIC_CONFIGS = {
+    "port":                             PORT,
+    "master_port":                      MASTER_PORT,
     "variant":                          VARIANT,
     "width":                            RESOLUTION,
     "height":                           RESOLUTION,

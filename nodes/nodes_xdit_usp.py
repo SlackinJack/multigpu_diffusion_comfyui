@@ -92,7 +92,7 @@ class xDiTUSPImageSampler:
         if positive_prompt is not None: data["positive"] = positive_prompt
         if negative_prompt is not None: data["negative"] = negative_prompt
 
-        response = get_result(data, bar)
+        response = get_result(host_config["port"], data, bar)
         if response is not None:
             bar.update_absolute(100)
             print("Successfully created media")
@@ -156,7 +156,7 @@ class xDiTUSPVideoSampler:
             image = image.squeeze(0)                # NHWC -> HWC
             data["image"] = convert_tensor_to_b64(image)
 
-        response = get_result(data, bar)
+        response = get_result(host_config["port"], data, bar)
         if response is not None:
             bar.update_absolute(100)
             print("Successfully created media")

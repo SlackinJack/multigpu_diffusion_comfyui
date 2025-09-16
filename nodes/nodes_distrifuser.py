@@ -61,7 +61,7 @@ class DistrifuserSDSampler:
                 "negative_prompt":  PROMPT,
                 "positive_embeds":  CONDITIONING,
                 "negative_embeds":  CONDITIONING,
-                "image":            IMAGE,
+                "ip_image":         IMAGE,
                 "latent":           LATENT,
             }
         }
@@ -82,7 +82,7 @@ class DistrifuserSDSampler:
         negative_prompt=None,
         positive_embeds=None,
         negative_embeds=None,
-        image=None,
+        ip_image=None,
         latent=None,
     ):
         assert (len(positive_prompt) > 0 or positive_embeds), "You must provide a prompt."
@@ -110,11 +110,11 @@ class DistrifuserSDSampler:
         if negative_embeds is not None: data["negative_embeds"] = pickle_and_encode_b64(negative_embeds)
         if latent is not None:          data["latent"] = pickle_and_encode_b64(latent["samples"])
 
-        if image is not None and host_config.get("ip_adapter"):
-            image = image.squeeze(0)                # NHWC -> HWC
-            data["image"] = convert_tensor_to_b64(image)
+        if ip_image is not None and host_config.get("ip_adapter"):
+            ip_image = ip_image.squeeze(0)  # NHWC -> HWC
+            data["ip_image"] = convert_tensor_to_b64(ip_image)
 
-        response = get_result(data, bar)
+        response = get_result(host_config["port"], data, bar)
         if response is not None:
             bar.update_absolute(100)
             print("Successfully created media")

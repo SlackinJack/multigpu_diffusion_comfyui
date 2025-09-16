@@ -65,12 +65,11 @@ class xDiTSampler:
                 "positive_embeds":  CONDITIONING,
                 "negative_embeds":  CONDITIONING,
                 "ip_image":         IMAGE,
-                "ip_image_scale":   SCALE_PERCENTAGE,
                 "latent":           LATENT,
             }
         }
 
-    RETURN_TYPES = IMAGE
+    RETURN_TYPES = ("IMAGE", "LATENT",)
     FUNCTION = "generate"
     CATEGORY = XDIT_CATEGORY
 
@@ -87,7 +86,6 @@ class xDiTSampler:
         positive_embeds=None,
         negative_embeds=None,
         ip_image=None,
-        ip_image_scale=None,
         latent=None,
     ):
         assert (len(positive_prompt) > 0 or positive_embeds is not None), "You must provide a prompt."
@@ -116,13 +114,13 @@ class xDiTSampler:
         if ip_image is not None and host_config.get("ip_adapter"):
             ip_image = ip_image.squeeze(0)  # NHWC -> HWC
             data["ip_image"] = convert_tensor_to_b64(ip_image)
-            data["ip_image_scale"] = ip_image_scale
 
-        response = get_result(data, bar)
+        response = get_result(host_config["port"], data, bar)
         if response is not None:
+            image_out, latent_out = response
             bar.update_absolute(100)
             print("Successfully created media")
-            return (convert_b64_to_nhwc_tensor(response),)
+            return (convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
         else:
             assert False, "No media generated.\nCheck console for details."
 

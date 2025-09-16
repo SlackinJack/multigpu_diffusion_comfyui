@@ -28,12 +28,28 @@ class HostConfig:
 
 
 class SchedulerSelector:
+    # TODO: input sigmas
     @classmethod
-    def INPUT_TYPES(s): return { "required": { "scheduler": SCHEDULER_LIST, "karras": BOOLEAN_DEFAULT_FALSE } }
+    def INPUT_TYPES(s): return {
+        "required": {
+            "scheduler":                SCHEDULER_LIST,
+            "use_karras_sigmas":        BOOLEAN_DEFAULT_FALSE,
+            "timestep_spacing":         TIMESTEP_LIST,
+            "rescale_betas_zero_snr":   BOOLEAN_DEFAULT_FALSE,
+            "use_exponential_sigmas":   BOOLEAN_DEFAULT_FALSE,
+            "use_beta_sigmas":          BOOLEAN_DEFAULT_FALSE,
+
+        }
+    }
     RETURN_TYPES    = SCHEDULER
     FUNCTION        = "get"
     CATEGORY        = ROOT_CATEGORY_GENERAL
-    def get(self, scheduler, karras): return ((scheduler if not karras else "k_" + scheduler),)
+    def get(self, **kwargs):
+        scheduler_config = {}
+        for k, v in kwargs.items():
+            if str(v) != "default":
+                scheduler_config[k] = v
+        return (scheduler_config,)
 
 
 class CheckpointSelector:

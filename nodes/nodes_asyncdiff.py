@@ -1,4 +1,5 @@
 import base64
+import copy
 import json
 import os
 import pickle
@@ -59,9 +60,7 @@ class AsyncDiffADSampler:
             "optional": {
                 "negative_prompt":      PROMPT,
                 "ip_image":             IMAGE,
-                "ip_image_scale":       SCALE_PERCENTAGE,
                 "control_image":        IMAGE,
-                "control_image_scale":  SCALE_PERCENTAGE,
             }
         }
 
@@ -80,9 +79,7 @@ class AsyncDiffADSampler:
         num_frames,
         negative_prompt=None,
         ip_image=None,
-        ip_image_scale=None,
         control_image=None,
-        control_image_scale=None,
     ):
         assert (host_config.get("motion_module") is not None) or (host_config.get("motion_adapter") is not None), "Either a motion module or a motion adapter must be set."
         assert (host_config.get("motion_module") is None) or (host_config.get("motion_adapter") is None), "Only one motion module or motion adapter must be set."
@@ -105,14 +102,12 @@ class AsyncDiffADSampler:
         if ip_image is not None and host_config.get("ip_adapter"):
             ip_image = ip_image.squeeze(0)              # NHWC -> HWC
             data["ip_image"] = convert_tensor_to_b64(ip_image)
-            data["ip_image_scale"] = ip_image_scale,
 
         if control_image is not None and host_config.get("control_net"):
             control_image = control_image.squeeze(0)    # NHWC -> HWC
             data["control_image"] = convert_tensor_to_b64(control_image)
-            data["control_image_scale"] = image_scale,
 
-        response = get_result(data, bar)
+        response = get_result(host_config["port"], data, bar)
         if response is not None:
             bar.update_absolute(100)
             images = decode_b64_and_unpickle(response)
@@ -141,16 +136,15 @@ class AsyncDiffSDSampler:
                 "positive_prompt":      PROMPT,
                 "negative_prompt":      PROMPT,
                 "ip_image":             IMAGE,
-                "ip_image_scale":       SCALE_PERCENTAGE,
                 "control_image":        IMAGE,
-                "control_image_scale":  SCALE_PERCENTAGE,
                 "positive_embeds":      CONDITIONING,
                 "negative_embeds":      CONDITIONING,
                 "latent":               LATENT,
+                "sigmas":               ("SIGMAS",),
             }
         }
 
-    RETURN_TYPES    = IMAGE
+    RETURN_TYPES    = ("IMAGE", "LATENT",)
     FUNCTION        = "generate"
     CATEGORY        = ASYNCDIFF_CATEGORY
 
@@ -165,12 +159,11 @@ class AsyncDiffSDSampler:
         positive_prompt=None,
         negative_prompt=None,
         ip_image=None,
-        ip_image_scale=None,
         control_image=None,
-        control_image_scale=None,
         positive_embeds=None,
         negative_embeds=None,
-        latent=None
+        latent=None,
+        sigmas=None,
     ):
         assert (len(positive_prompt) > 0 or positive_embeds is not None), "You must provide a positive input."
         if positive_prompt is not None and len(positive_prompt) > 0:
@@ -194,20 +187,20 @@ class AsyncDiffSDSampler:
         if positive_embeds is not None: data["positive_embeds"] = pickle_and_encode_b64(positive_embeds)
         if negative_embeds is not None: data["negative_embeds"] = pickle_and_encode_b64(negative_embeds)
         if latent is not None:          data["latent"] = pickle_and_encode_b64(latent["samples"])
+        if sigmas is not None:          data["sigmas"] = pickle_and_encode_b64(sigmas)
         if ip_image is not None and host_config.get("ip_adapter") is not None:
             ip_image = ip_image.squeeze(0)              # NHWC -> HWC
             data["ip_image"] = convert_tensor_to_b64(ip_image)
-            data["ip_image_scale"] = ip_image_scale
         if control_image is not None and host_config.get("control_net") is not None:
             control_image = control_image.squeeze(0)    # NHWC -> HWC
             data["control_image"] = convert_tensor_to_b64(control_image)
-            data["control_image_scale"] = control_image_scale
 
-        response = get_result(data, bar)
+        response = get_result(host_config["port"], data, bar)
         if response is not None:
+            image_out, latent_out = response
             bar.update_absolute(100)
             print("Successfully created media")
-            return (convert_b64_to_nhwc_tensor(response),)
+            return (convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
         else:
             assert False, "No media generated.\nCheck console for details."
 
@@ -220,7 +213,6 @@ class AsyncDiffSVDSampler:
                 "host_config":          GENERIC_CONFIG,
                 "asyncdiff_config":     ASYNCDIFF_CONFIG,
                 "image":                IMAGE,
-                "image_scale":          SCALE_PERCENTAGE,
                 "seed":                 SEED,
                 "steps":                STEPS,
                 "decode_chunk_size":    DECODE_CHUNK_SIZE,
@@ -239,7 +231,6 @@ class AsyncDiffSVDSampler:
         host_config,
         asyncdiff_config,
         image,
-        image_scale,
         seed,
         steps,
         decode_chunk_size,
@@ -257,7 +248,6 @@ class AsyncDiffSVDSampler:
         b64_image = convert_tensor_to_b64(image)
         data = {
             "image":                b64_image,
-            "image_scale":          image_scale,
             "seed":                 seed,
             "steps":                steps,
             "decode_chunk_size":    decode_chunk_size,
@@ -265,7 +255,7 @@ class AsyncDiffSVDSampler:
             "motion_bucket_id":     motion_bucket_id,
             "noise_aug_strength":   noise_aug_strength,
         }
-        response = get_result(data, bar)
+        response = get_result(host_config["port"], data, bar)
         if response is not None:
             bar.update_absolute(100)
             images = decode_b64_and_unpickle(response)
@@ -286,7 +276,6 @@ class AsyncDiffSDUpscaleSampler:
                 "host_config":      GENERIC_CONFIG,
                 "asyncdiff_config": ASYNCDIFF_CONFIG,
                 "image":            IMAGE,
-                "image_scale":      SCALE_PERCENTAGE,
                 "positive_prompt":  PROMPT,
                 "seed":             SEED,
                 "steps":            STEPS,
@@ -306,7 +295,6 @@ class AsyncDiffSDUpscaleSampler:
         host_config,
         asyncdiff_config,
         image,
-        image_scale,
         positive_prompt,
         seed,
         steps,
@@ -329,7 +317,6 @@ class AsyncDiffSDUpscaleSampler:
             b64_image = convert_tensor_to_b64(im)
             data = {
                 "image":        b64_image,
-                "image_scale":  image_scale,
                 "positive":     positive_prompt,
                 "seed":         seed,
                 "steps":        steps,
@@ -339,7 +326,7 @@ class AsyncDiffSDUpscaleSampler:
             if negative_prompt is not None: data["negative"] = negative_prompt
 
             try:
-                response = get_result(data, bar)
+                response = get_result(host_config["port"], data, bar)
                 if response is not None:
                     print(f"Finished upscaling image: {i}/{len(images)}")
                     im2 = decode_b64_and_unpickle(response)
