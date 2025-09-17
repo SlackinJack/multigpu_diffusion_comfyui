@@ -131,6 +131,7 @@ class AsyncDiffSDSampler:
                 "steps":                STEPS,
                 "guidance_scale":       CFG,
                 "clip_skip":            CLIP_SKIP,
+                "denoise":              DENOISE,
             },
             "optional": {
                 "positive_prompt":      PROMPT,
@@ -156,6 +157,7 @@ class AsyncDiffSDSampler:
         steps,
         guidance_scale,
         clip_skip,
+        denoise,
         positive_prompt=None,
         negative_prompt=None,
         ip_image=None,
@@ -180,6 +182,7 @@ class AsyncDiffSDSampler:
             "steps":        steps,
             "cfg":          guidance_scale,
             "clip_skip":    clip_skip,
+            "denoise":      denoise,
         }
 
         if positive_prompt is not None: data["positive"] = positive_prompt

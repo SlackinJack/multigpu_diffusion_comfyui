@@ -13,15 +13,14 @@ controlnet_dir      = os.path.join(models_dir, "controlnet")
 controlnets         = getModelSubfoldersInFolder(controlnet_dir)
 loras_dir           = os.path.join(models_dir, "loras")
 loras               = getModelFilesInFolder(loras_dir)
-ipadapter_dir       = os.path.join(models_dir, "ipadapter")
 vae_dir             = os.path.join(models_dir, "vae")
 vaes                = getModelFilesInFolder(vae_dir)
-ipadapter_dir       = os.path.join(models_dir, "ipadapter")
 motion_adapter_dir  = os.path.join(models_dir, "animatediff_models")
 motion_adapters     = getModelSubfoldersInFolder(motion_adapter_dir)
 
 
 # start unsafe loaders
+ipadapter_dir       = os.path.join(models_dir, "ipadapter")
 ipadapters          = getModelFilesInFolderUnsafe(ipadapter_dir)
 motion_modules      = getModelFilesInFolderUnsafe(motion_adapter_dir)
 # end unsafe loaders
@@ -31,6 +30,7 @@ INT_MAX                         = 2 ** 32 - 1
 INT_MIN                         = -1 * INT_MAX
 BOOLEAN_DEFAULT_TRUE            = ("BOOLEAN",                           { "default": True })
 BOOLEAN_DEFAULT_FALSE           = ("BOOLEAN",                           { "default": False })
+TRILEAN_WITH_DEFAULT            = (["true", "false", "default"],        { "default": "default" })
 GENERIC_CONFIG                  = ("MD_GENERIC_CONFIG",)
 ASYNCDIFF_CONFIG                = ("MD_ASYNCDIFF_CONFIG",)
 DISTRIFUSER_CONFIG              = ("MD_DISTRIFUSER_CONFIG",)
@@ -73,8 +73,9 @@ SCHEDULER_LIST                  = ([
                                     "pndm",
                                     "tcd",
                                     "unipc"
-                                ],                   { "default": "ddim" })
-TIMESTEP_LIST                   = (["default", "linspace", "trailing"], { "default": "default" })
+                                ],                                      { "default": "ddim" })
+TIMESTEP_LIST                   = (["default", "leading",
+                                    "linspace", "trailing"],            { "default": "default" })
 VARIANT                         = (["bf16", "fp16", "fp32"],            { "default": "fp16" })
 QUANT                           = (["disabled", "float8",
                                     "int8", "int4", "int2"],            { "default": "disabled" })
@@ -85,7 +86,7 @@ RESOLUTION                      = ("INT",                               { "defau
 SEED                            = ("INT",                               { "default": 0,         "min": 0,           "max": INT_MAX,     "step": 1 })
 STEPS                           = ("INT",                               { "default": 60,        "min": 1,           "max": INT_MAX,     "step": 1 })
 CLIP_SKIP                       = ("INT",                               { "default": 0,         "min": 0,           "max": INT_MAX,     "step": 1 })
-DENOISING_START                 = ("FLOAT",                             { "default": 0.0,       "min": 0,           "max": 1,           "step": 0.01 })
+DENOISE                         = ("FLOAT",                             { "default": 1.00,      "min": 0.00,        "max": 1.0,         "step": 0.01 })
 DECODE_CHUNK_SIZE               = ("INT",                               { "default": 8,         "min": 1,           "max": INT_MAX,     "step": 1 })
 NUM_FRAMES                      = ("INT",                               { "default": 25,        "min": 1,           "max": INT_MAX,     "step": 1 })
 MOTION_BUCKET_ID                = ("INT",                               { "default": 180,       "min": 1,           "max": INT_MAX,     "step": 1 })
@@ -178,3 +179,8 @@ GENERIC_CONFIGS_OPTIONAL = {
     "motion_adapter_lora":  MOTION_ADAPTER_LORA,
 }
 
+
+def trilean(value):
+    if value == "true": return True
+    if value == "false": return False
+    return None

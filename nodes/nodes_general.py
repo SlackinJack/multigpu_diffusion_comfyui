@@ -28,27 +28,37 @@ class HostConfig:
 
 
 class SchedulerSelector:
-    # TODO: input sigmas
+    @classmethod
+    def INPUT_TYPES(s): return { "required": { "scheduler": SCHEDULER_LIST } }
+    RETURN_TYPES    = SCHEDULER
+    FUNCTION        = "get"
+    CATEGORY        = ROOT_CATEGORY_GENERAL
+    def get(self, scheduler): return ({ "scheduler": scheduler },)
+
+
+class AdvancedSchedulerSelector:
     @classmethod
     def INPUT_TYPES(s): return {
         "required": {
             "scheduler":                SCHEDULER_LIST,
-            "use_karras_sigmas":        BOOLEAN_DEFAULT_FALSE,
             "timestep_spacing":         TIMESTEP_LIST,
-            "rescale_betas_zero_snr":   BOOLEAN_DEFAULT_FALSE,
-            "use_exponential_sigmas":   BOOLEAN_DEFAULT_FALSE,
-            "use_beta_sigmas":          BOOLEAN_DEFAULT_FALSE,
+            "use_karras_sigmas":        TRILEAN_WITH_DEFAULT,
+            "rescale_betas_zero_snr":   TRILEAN_WITH_DEFAULT,
+            "use_exponential_sigmas":   TRILEAN_WITH_DEFAULT,
+            "use_beta_sigmas":          TRILEAN_WITH_DEFAULT,
 
         }
     }
     RETURN_TYPES    = SCHEDULER
     FUNCTION        = "get"
     CATEGORY        = ROOT_CATEGORY_GENERAL
-    def get(self, **kwargs):
-        scheduler_config = {}
+    def get(self, scheduler, timestep_spacing, **kwargs):
+        scheduler_config = { "scheduler": scheduler }
+        if timestep_spacing != "default":
+            scheduler_config["timestep_spacing"] = timestep_spacing
         for k, v in kwargs.items():
-            if str(v) != "default":
-                scheduler_config[k] = v
+            if trilean(v) != None:
+                scheduler_config[k] = trilean(v)
         return (scheduler_config,)
 
 
@@ -196,4 +206,3 @@ class EncodePromptWithCompel:
         del pipe
         gc.collect()
         return ([[embeds, { "pooled_output": pooled_embeds }]],)
-

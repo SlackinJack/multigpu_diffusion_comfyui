@@ -123,33 +123,40 @@ def close_host_process(port, host_process, reason):
     global configs
     if host_process is not None:
         print(f'Stopping host process: {reason}')
-        host = psutil.Process(host_process.pid)
-        workers = [host] + host.children(recursive=True)
-        while True:
-            for w in workers:
+        def close(port, host_process):
+            host = psutil.Process(host_process.pid)
+            workers = [host] + host.children(recursive=True)
+            while True:
+                remain = []
+                for w in workers:
+                    remain.append(w)
+                    try:
+                        print(f'Stopping PID: {w.pid}')
+                        w.kill()
+                    except psutil.NoSuchProcess:
+                        remain.remove(w)
+                        pass
+                    except:
+                        pass
                 try:
-                    print(f'Stopping PID: {w.pid}')
-                    w.terminate()
-                    time.sleep(1)
-                    w.kill()    
-                except:
-                    pass
-            try:
-                time.sleep(3)
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.bind(("localhost", port))
-                time.sleep(1)
-                s.close()
-                del configs[str(port)]
-                print('Host has been stopped')
-                return
-            except socket.error as e:
-                if e.errno == errno.EADDRINUSE:
-                    print('Host still active - waiting to retry')
                     time.sleep(3)
-            except Exception as ex:
-                print(f'Error occurred: {str(ex)} - waiting to retry')
-                time.sleep(3)
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.bind(("localhost", port))
+                    time.sleep(1)
+                    s.close()
+                    if configs.get(str(port)) is not None: del configs[str(port)]
+                    print('Host has been stopped')
+                    return
+                except socket.error as e:
+                    if e.errno == errno.EADDRINUSE:
+                        print('Host still active - waiting to retry')
+                        time.sleep(3)
+                except Exception as ex:
+                    print(f'Error occurred - waiting to retry\n{str(ex)}')
+                    time.sleep(3)
+                workers = remain
+        threading.Thread(target=close, args=(port, host_process,)).start()
+    return
 
 
 def get_result(port, data, bar):
