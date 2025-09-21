@@ -23,7 +23,7 @@ DISTRIFUSER_CONFIGS = {
     "nproc_per_node":   NPROC_PER_NODE,
     "parallelism":      DISTRIFUSER_PARALLELISM_LIST,
     "sync_mode":        DISTRIFUSER_SYNC_MODE_LIST,
-    "no_cuda_graph":    BOOLEAN_DEFAULT_FALSE,
+    "no_cuda_graph":    BOOLEAN_DEFAULT_TRUE,
     "no_split_batch":   BOOLEAN_DEFAULT_FALSE,
 }
 
@@ -55,6 +55,7 @@ class DistrifuserSDSampler:
                 "steps":            STEPS,
                 "guidance_scale":   CFG,
                 "clip_skip":        CLIP_SKIP,
+                "denoise":          DENOISE,
             },
             "optional": {
                 "positive_prompt":  PROMPT,
@@ -78,6 +79,7 @@ class DistrifuserSDSampler:
         steps,
         guidance_scale,
         clip_skip,
+        denoise,
         positive_prompt=None,
         negative_prompt=None,
         positive_embeds=None,
@@ -102,6 +104,7 @@ class DistrifuserSDSampler:
             "seed": seed,
             "cfg": guidance_scale,
             "clip_skip": clip_skip,
+            "denoise": denoise,
         }
 
         if positive_prompt is not None: data["positive"] = positive_prompt

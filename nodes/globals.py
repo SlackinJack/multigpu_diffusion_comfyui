@@ -58,21 +58,23 @@ MOTION_ADAPTER_LORA             = ("MD_MOTION_ADAPTER_LORA",)
 MOTION_ADAPTER_LIST             = (motion_adapters,)
 SCHEDULER                       = ("MD_SCHEDULER",)
 SCHEDULER_LIST                  = ([
+                                    "ddim",
+                                    "ddpm",
+                                    "deis",
+                                    "dpm_2",
+                                    "dpm_2_a",
+                                    "dpm_sde",
                                     "dpmpp_2m",
                                     "dpmpp_2m_sde",
                                     "dpmpp_sde",
-                                    "dpm_2",
-                                    "dpm_2_a",
                                     "euler",
                                     "euler_a",
                                     "heun",
+                                    "ipndm",
                                     "lms",
-                                    "ddim",
-                                    "deis",
-                                    "dpm_sde",
                                     "pndm",
                                     "tcd",
-                                    "unipc"
+                                    "unipc",
                                 ],                                      { "default": "ddim" })
 TIMESTEP_LIST                   = (["default", "leading",
                                     "linspace", "trailing"],            { "default": "default" })
