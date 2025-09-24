@@ -42,21 +42,21 @@ def launch_host(config, backend, bar):
         last_config = current_config.get("last_config")
 
         if host_process is None or loaded_backend is None or last_config is None:
-            close_host_process(port, host_process, "Invalid host configuration")
+            close_host_process(port, host_process, "Invalid host configuration", synced_close=True)
             closed = True
 
         if not closed and (loaded_backend != backend or len(loaded_backend) == 0):
-            close_host_process(port, host_process, "Backend changed")
+            close_host_process(port, host_process, "Backend changed", synced_close=True)
             closed = True
 
         if not closed:
             for k, v in last_config.items():
                 if k not in config:
-                    close_host_process(port, host_process, "Updated configuration")
+                    close_host_process(port, host_process, "Updated configuration", synced_close=True)
                     closed = True
                     break
                 if str(config[k]) != str(v):
-                    close_host_process(port, host_process, "Updated configuration")
+                    close_host_process(port, host_process, "Updated configuration", synced_close=True)
                     closed = True
                     break
 
@@ -119,7 +119,7 @@ def check_host_process(host_process, port, timeout, bar):
             assert False, f'Failed to launch host within {timeout} seconds.\nCheck console for details.'
 
 
-def close_host_process(port, host_process, reason):
+def close_host_process(port, host_process, reason, synced_close=False):
     global configs
     if host_process is not None:
         print(f'Stopping host process: {reason}')
@@ -155,7 +155,10 @@ def close_host_process(port, host_process, reason):
                     print(f'Error occurred - waiting to retry\n{str(ex)}')
                     time.sleep(3)
                 workers = remain
-        threading.Thread(target=close, args=(port, host_process,)).start()
+        if not synced_close:
+            threading.Thread(target=close, args=(port, host_process,)).start()
+        else:
+            close(port, host_process)
     return
 
 
