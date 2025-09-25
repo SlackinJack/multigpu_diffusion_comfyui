@@ -67,7 +67,7 @@ class DistrifuserSDSampler:
             }
         }
 
-    RETURN_TYPES = IMAGE
+    RETURN_TYPES = ("IMAGE", "LATENT",)
     FUNCTION = "generate"
     CATEGORY = DISTRIFUSER_CATEGORY
 
@@ -119,9 +119,10 @@ class DistrifuserSDSampler:
 
         response = get_result(host_config["port"], data, bar)
         if response is not None:
+            image_out, latent_out = response
             bar.update_absolute(100)
             print("Successfully created media")
-            return (convert_b64_to_nhwc_tensor(response),)
+            return (convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
         else:
             assert False, "No media generated.\nCheck console for details."
 
