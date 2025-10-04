@@ -90,10 +90,11 @@ def launch_host(config, backend, bar):
         for c in cmd: cmd_str += '\n' + c
         print(f'Starting host:{str(cmd_str)}')
         host_process = subprocess.Popen(cmd)
-        configs[str(port)] = {}
-        configs[str(port)]["host_process"] = host_process
-        configs[str(port)]["loaded_backend"] = backend
-        configs[str(port)]["last_config"] = config
+        configs[str(port)] = {
+            "host_process": host_process,
+            "loaded_backend": backend,
+            "last_config": config,
+        }
         timeout = config.get("pipeline_init_timeout")
         check_host_process(host_process, port, timeout, bar)
         bar.update_absolute(33)
@@ -130,30 +131,29 @@ def close_host_process(port, host_process, reason, synced_close=False):
                 remain = []
                 for w in workers:
                     remain.append(w)
-                    try:
-                        print(f'Stopping PID: {w.pid}')
-                        w.kill()
-                    except psutil.NoSuchProcess:
+                    result = subprocess.run(["kill", "-9", str(w.pid)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    if result.returncode == 1:
                         remain.remove(w)
-                        pass
-                    except:
-                        pass
-                try:
+                if len(remain) > 0:
+                    print("Waiting for processes to close: " + str(list(r.pid for r in remain)))
                     time.sleep(3)
-                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    s.bind(("localhost", port))
-                    time.sleep(1)
-                    s.close()
-                    if configs.get(str(port)) is not None: del configs[str(port)]
-                    print('Host has been stopped')
-                    return
-                except socket.error as e:
-                    if e.errno == errno.EADDRINUSE:
-                        print('Host still active - waiting to retry')
+                else:
+                    try:
                         time.sleep(3)
-                except Exception as ex:
-                    print(f'Error occurred - waiting to retry\n{str(ex)}')
-                    time.sleep(3)
+                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        s.bind(("localhost", port))
+                        time.sleep(1)
+                        s.close()
+                        if configs.get(str(port)) is not None: del configs[str(port)]
+                        print('Host has been stopped')
+                        return
+                    except socket.error as e:
+                        if e.errno == errno.EADDRINUSE:
+                            print('Host still active - waiting to retry')
+                            time.sleep(3)
+                    except Exception as ex:
+                        print(f'Error occurred - waiting to retry\n{str(ex)}')
+                        time.sleep(3)
                 workers = remain
         if not synced_close:
             threading.Thread(target=close, args=(port, host_process,)).start()
@@ -164,6 +164,7 @@ def close_host_process(port, host_process, reason, synced_close=False):
 
 def get_result(port, data, bar):
     global configs
+    assert configs.get(str(port)) is not None, "Host not initialized."
     host_process = configs[str(port)]["host_process"]
     last_config = configs[str(port)]["last_config"]
     run = True

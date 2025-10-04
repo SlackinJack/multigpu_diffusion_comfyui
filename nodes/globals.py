@@ -89,6 +89,7 @@ SEED                            = ("INT",                               { "defau
 STEPS                           = ("INT",                               { "default": 60,        "min": 1,           "max": INT_MAX,     "step": 1 })
 CLIP_SKIP                       = ("INT",                               { "default": 0,         "min": 0,           "max": INT_MAX,     "step": 1 })
 DENOISE                         = ("FLOAT",                             { "default": 1.00,      "min": 0.00,        "max": 1.0,         "step": 0.01 })
+DENOISING_END                   = ("FLOAT",                             { "default": 1.00,      "min": 0.00,        "max": 1.0,         "step": 0.01 })
 DECODE_CHUNK_SIZE               = ("INT",                               { "default": 8,         "min": 1,           "max": INT_MAX,     "step": 1 })
 NUM_FRAMES                      = ("INT",                               { "default": 25,        "min": 1,           "max": INT_MAX,     "step": 1 })
 MOTION_BUCKET_ID                = ("INT",                               { "default": 180,       "min": 1,           "max": INT_MAX,     "step": 1 })

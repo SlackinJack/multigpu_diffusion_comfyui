@@ -132,6 +132,7 @@ class AsyncDiffSDSampler:
                 "guidance_scale":       CFG,
                 "clip_skip":            CLIP_SKIP,
                 "denoise":              DENOISE,
+                "denoising_end":        DENOISING_END,
             },
             "optional": {
                 "positive_prompt":      PROMPT,
@@ -158,6 +159,7 @@ class AsyncDiffSDSampler:
         guidance_scale,
         clip_skip,
         denoise,
+        denoising_end,
         positive_prompt=None,
         negative_prompt=None,
         ip_image=None,
@@ -178,11 +180,12 @@ class AsyncDiffSDSampler:
         launch_host(host_config, "asyncdiff", bar)
 
         data = {
-            "seed":         seed,
-            "steps":        steps,
-            "cfg":          guidance_scale,
-            "clip_skip":    clip_skip,
-            "denoise":      denoise,
+            "seed":             seed,
+            "steps":            steps,
+            "cfg":              guidance_scale,
+            "clip_skip":        clip_skip,
+            "denoise":          denoise,
+            "denoising_end":    denoising_end,
         }
 
         if positive_prompt is not None: data["positive"] = positive_prompt

@@ -58,6 +58,8 @@ class xDiTSampler:
                 "steps":            STEPS,
                 "guidance_scale":   CFG,
                 "clip_skip":        CLIP_SKIP,
+                "denoise":          DENOISE,
+                "denoising_end":    DENOISING_END,
             },
             "optional": {
                 "positive_prompt":  PROMPT,
@@ -81,6 +83,8 @@ class xDiTSampler:
         steps,
         guidance_scale,
         clip_skip,
+        denoise,
+        denoising_end,
         positive_prompt=None,
         negative_prompt=None,
         positive_embeds=None,
@@ -99,10 +103,12 @@ class xDiTSampler:
         launch_host(host_config, "xdit", bar)
 
         data = {
-            "steps": steps,
-            "seed": seed,
-            "cfg": guidance_scale,
-            "clip_skip": clip_skip,
+            "steps":            steps,
+            "seed":             seed,
+            "cfg":              guidance_scale,
+            "clip_skip":        clip_skip,
+            "denoise":          denoise,
+            "denoising_end":    denoising_end,
         }
 
         if positive_prompt is not None: data["positive"] = positive_prompt
