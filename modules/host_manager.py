@@ -1,4 +1,5 @@
 import base64
+import copy
 import errno
 import json
 import os
@@ -128,33 +129,24 @@ def close_host_process(port, host_process, reason, synced_close=False):
             host = psutil.Process(host_process.pid)
             workers = [host] + host.children(recursive=True)
             while True:
-                remain = []
                 for w in workers:
-                    remain.append(w)
                     result = subprocess.run(["kill", "-9", str(w.pid)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    if result.returncode == 1:
-                        remain.remove(w)
-                if len(remain) > 0:
-                    print("Waiting for processes to close: " + str(list(r.pid for r in remain)))
+                try:
                     time.sleep(3)
-                else:
-                    try:
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.bind(("localhost", port))
+                    time.sleep(1)
+                    s.close()
+                    if configs.get(str(port)) is not None: del configs[str(port)]
+                    print('Host has been stopped')
+                    return
+                except socket.error as e:
+                    if e.errno == errno.EADDRINUSE:
+                        print('Host still active - waiting to retry')
                         time.sleep(3)
-                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        s.bind(("localhost", port))
-                        time.sleep(1)
-                        s.close()
-                        if configs.get(str(port)) is not None: del configs[str(port)]
-                        print('Host has been stopped')
-                        return
-                    except socket.error as e:
-                        if e.errno == errno.EADDRINUSE:
-                            print('Host still active - waiting to retry')
-                            time.sleep(3)
-                    except Exception as ex:
-                        print(f'Error occurred - waiting to retry\n{str(ex)}')
-                        time.sleep(3)
-                workers = remain
+                except Exception as ex:
+                    print(f'Error occurred - waiting to retry\n{str(ex)}')
+                    time.sleep(3)
         if not synced_close:
             threading.Thread(target=close, args=(port, host_process,)).start()
         else:
