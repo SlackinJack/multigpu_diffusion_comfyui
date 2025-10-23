@@ -43,21 +43,21 @@ def launch_host(config, backend, bar):
         last_config = current_config.get("last_config")
 
         if host_process is None or loaded_backend is None or last_config is None:
-            close_host_process(port, host_process, "Invalid host configuration", synced_close=True)
+            close_host_process(port, host_process, "Invalid host configuration", wait_for_close=True)
             closed = True
 
         if not closed and (loaded_backend != backend or len(loaded_backend) == 0):
-            close_host_process(port, host_process, "Backend changed", synced_close=True)
+            close_host_process(port, host_process, "Backend changed", wait_for_close=True)
             closed = True
 
         if not closed:
             for k, v in last_config.items():
                 if k not in config:
-                    close_host_process(port, host_process, "Updated configuration", synced_close=True)
+                    close_host_process(port, host_process, "Updated configuration", wait_for_close=True)
                     closed = True
                     break
                 if str(config[k]) != str(v):
-                    close_host_process(port, host_process, "Updated configuration", synced_close=True)
+                    close_host_process(port, host_process, "Updated configuration", wait_for_close=True)
                     closed = True
                     break
 
@@ -82,8 +82,10 @@ def launch_host(config, backend, bar):
                 if v == "True":
                     cmd.append(f'--{k}')
                 else:
-                    if v == "False": continue
-                    if k == "quantize_to" and v == "disabled": continue
+                    if v == "False":                                                                                continue
+                    if k in ["quantize_unet_to", "quantize_encoder_to", "quantize_misc_to"] and v == "disabled":    continue
+                    if k in ["compile_backend", "compile_mode"] and v == "default":                                 continue
+                    if k in ["compile_options"] and len(v) == 0:                                                    continue
                     cmd.append(f'--{k}={str(v)}')
 
         # launch host
@@ -117,14 +119,15 @@ def check_host_process(host_process, port, timeout, bar):
         time.sleep(1)
         current += 1
         if current >= timeout:
-            close_host_process(port, host_process, "Timed out")
+            close_host_process(port, host_process, "Timed out", wait_for_close=True)
             assert False, f'Failed to launch host within {timeout} seconds.\nCheck console for details.'
 
 
-def close_host_process(port, host_process, reason, synced_close=False):
+def close_host_process(port, host_process, reason, wait_for_close=False):
     global configs
     if host_process is not None:
-        print(f'Stopping host process: {reason}')
+        if wait_for_close:  print(f'Synchronously stopping host process ({reason})')
+        else:               print(f'Stopping host process ({reason})')
         def close(port, host_process):
             host = psutil.Process(host_process.pid)
             workers = [host] + host.children(recursive=True)
@@ -147,10 +150,8 @@ def close_host_process(port, host_process, reason, synced_close=False):
                 except Exception as ex:
                     print(f'Error occurred - waiting to retry\n{str(ex)}')
                     time.sleep(3)
-        if not synced_close:
-            threading.Thread(target=close, args=(port, host_process,)).start()
-        else:
-            close(port, host_process)
+        if not wait_for_close:  threading.Thread(target=close, args=(port, host_process,)).start()
+        else:                   close(port, host_process)
     return
 
 
@@ -181,7 +182,7 @@ def get_result(port, data, bar):
     try:
         response = requests.post(f"http://localhost:{port}/generate", json=data)
     except Exception as e:
-        close_host_process(port, host_process, "Connection error")
+        close_host_process(port, host_process, "Connection error", wait_for_close=True)
         assert False, f"Could not post request to host.\nCheck console for details.\n\n{str(e)}"
 
     run = False
@@ -192,7 +193,7 @@ def get_result(port, data, bar):
         output_image_b64 = response_data.get("output")
         output_latent_b64 = response_data.get("latent")
         if last_config is not None and not last_config["keepalive"]:
-            close_host_process(port, host_process, "Keepalive option off")
+            close_host_process(port, host_process, "Keepalive option off", wait_for_close=last_config["wait_for_host_close"])
         if output_image_b64 is None and output_latent_b64 is None:
             assert response_data is not None, "No response from host.\nCheck console for details."
             assert False, response_data.get("message")
@@ -201,6 +202,6 @@ def get_result(port, data, bar):
             else:                               return output_image_b64
     except Exception as e:
         run = False
-        close_host_process(port, host_process, "Unknown error")
+        close_host_process(port, host_process, "Unknown error", wait_for_close=True)
         assert False, f"An error occurred while generating image.\nCheck console for details.\n\n{str(e)}"
 

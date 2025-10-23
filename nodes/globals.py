@@ -31,7 +31,7 @@ INT_MIN                         = -1 * INT_MAX
 BOOLEAN_DEFAULT_TRUE            = ("BOOLEAN",                           { "default": True })
 BOOLEAN_DEFAULT_FALSE           = ("BOOLEAN",                           { "default": False })
 TRILEAN_WITH_DEFAULT            = (["true", "false", "default"],        { "default": "default" })
-GENERIC_CONFIG                  = ("MD_GENERIC_CONFIG",)
+GENERIC_CONFIG                  = ("MD_HOST_CONFIG",)
 ASYNCDIFF_CONFIG                = ("MD_ASYNCDIFF_CONFIG",)
 DISTRIFUSER_CONFIG              = ("MD_DISTRIFUSER_CONFIG",)
 XDIT_CONFIG                     = ("MD_XDIT_CONFIG",)
@@ -81,6 +81,16 @@ TIMESTEP_LIST                   = (["default", "leading",
 VARIANT                         = (["bf16", "fp16", "fp32"],            { "default": "fp16" })
 QUANT                           = (["disabled", "float8",
                                     "int8", "int4", "int2"],            { "default": "disabled" })
+COMPILE_BACKENDS                = ([
+                                    "default",
+                                    "inductor",
+                                    "eager"
+                                ],                                      { "default": "default" })
+COMPILE_MODES                   = (["default",
+                                    "reduce-overhead",
+                                    "max-autotune",
+                                    "max-autotune-no-cudagraphs",
+                                ],                                      { "default": "default" })
 NPROC_PER_NODE                  = ("INT",                               { "default": 2,         "min": 2,           "max": INT_MAX,     "step": 1 })
 SCALE_PERCENTAGE                = ("FLOAT",                             { "default": 100.0,     "min": 0.01,        "max": INT_MAX,     "step": 0.01 })
 PROMPT                          = ("STRING",                            { "default": "",        "multiline": True })
@@ -154,13 +164,19 @@ GENERIC_CONFIGS = {
     "height":                           RESOLUTION,
     "compile_unet":                     BOOLEAN_DEFAULT_FALSE,
     "compile_vae":                      BOOLEAN_DEFAULT_FALSE,
-    "compile_text_encoder":             BOOLEAN_DEFAULT_FALSE,
+    "compile_encoder":                  BOOLEAN_DEFAULT_FALSE,
+    "compile_backend":                  COMPILE_BACKENDS,
+    "compile_mode":                     COMPILE_MODES,
+    "compile_options":                  ("STRING",),
+    "compile_fullgraph_off":            BOOLEAN_DEFAULT_FALSE,
     "enable_vae_tiling":                BOOLEAN_DEFAULT_FALSE,
     "enable_vae_slicing":               BOOLEAN_DEFAULT_FALSE,
     "xformers_efficient":               BOOLEAN_DEFAULT_FALSE,
     "enable_model_cpu_offload":         BOOLEAN_DEFAULT_FALSE,
     "enable_sequential_cpu_offload":    BOOLEAN_DEFAULT_FALSE,
-    "quantize_to":                      QUANT,
+    "quantize_unet_to":                 QUANT,
+    "quantize_encoder_to":              QUANT,
+    "quantize_misc_to":                 QUANT,
     "warm_up_steps":                    WARM_UP_STEPS,
 }
 
@@ -168,6 +184,7 @@ GENERIC_CONFIGS = {
 GENERIC_CONFIGS_COMFY = {
     "pipeline_init_timeout":    PIPELINE_INIT_TIMEOUT,
     "keepalive":                BOOLEAN_DEFAULT_FALSE,
+    "wait_for_host_close":      BOOLEAN_DEFAULT_FALSE,
 }
 
 
