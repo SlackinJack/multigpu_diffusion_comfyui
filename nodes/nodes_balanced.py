@@ -8,22 +8,17 @@ from ..modules.host_manager import *
 from ..multigpu_diffusion.modules.utils import *
 
 
-ASYNCDIFF_CONFIGS = {
-    "model_n": MODEL_N,
-    "stride": STRIDE,
-    "time_shift": BOOLEAN_DEFAULT_FALSE,
-    "synced_steps": SYNCED_STEPS,
-    "synced_percent": SYNCED_PERCENT,
+BALANCED_CONFIGS = {
 }
 
 
-ASYNCDIFF_CONFIGS_OPTIONAL = {
+BALANCED_CONFIGS_OPTIONAL = {
     
 }
 
 
-class AsyncDiffConfig:
+class BalancedConfig:
     @classmethod
-    def INPUT_TYPES(s): return { "required": ASYNCDIFF_CONFIGS, "optional": ASYNCDIFF_CONFIGS_OPTIONAL, }
+    def INPUT_TYPES(s): return { "required": BALANCED_CONFIGS, "optional": BALANCED_CONFIGS_OPTIONAL, }
     RETURN_TYPES, FUNCTION, CATEGORY = BACKEND_CONFIG, "get_config", ROOT_CATEGORY_CONFIG
     def get_config(self, **kwargs): return (kwargs,)

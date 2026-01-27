@@ -2,34 +2,37 @@ import os
 from glob import glob
 
 
-def getModelFilesInFolder(folder_in):
-    return __get_files_in_folder(folder_in, ["safetensors"])
+def getModelFilesInFolder(folder_in, blacklist_folders=[]):
+    return __get_files_in_folder(folder_in, ["safetensors", "sft"], blacklist_folders)
 
 
-def getModelFilesInFolderUnsafe(folder_in):
-    return __get_files_in_folder(folder_in, ["safetensors", "bin", "ckpt", "pth"])
+def getModelFilesInFolderUnsafe(folder_in, blacklist_folders=[]):
+    return __get_files_in_folder(folder_in, ["safetensors", "sft", "bin", "ckpt", "pth", "gguf"], blacklist_folders)
 
 
-def getModelFilesInFolderGGUF(folder_in):
-    return __get_files_in_folder(folder_in, ["gguf"])
+def getModelConfigsInFolder(folder_in, blacklist_folders=[]):
+    return __get_files_in_folder(folder_in, ["json"], blacklist_folders)
 
 
-def getModelSubfoldersInFolder(folder_in):
-    return __get_folders_in_folder(folder_in)
+def getModelSubfoldersInFolder(folder_in, blacklist_folders=[]):
+    return __get_folders_in_folder(folder_in, blacklist_folders)
 
 
-def __get_folders_in_folder(folder_in):
+def __get_files_in_folder(folder_in, file_exts, blacklist_folders):
     out = []
-    for path in os.listdir(folder_in):
-        if os.path.isdir(os.path.join(folder_in, path)):
-            out.append(path)
+    for root, dirs, files in os.walk(folder_in, followlinks=True):
+        dirs[:] = [d for d in dirs if d not in blacklist_folders]
+        for f in files:
+            if any(f.endswith(ext) for ext in file_exts):
+                out.append(os.path.relpath(os.path.join(root, f), folder_in))
     return out
 
 
-def __get_files_in_folder(folder_in, model_extensions):
+def __get_folders_in_folder(folder_in, blacklist_folders):
     out = []
-    for path in os.walk(folder_in):
-        for f in glob(os.path.join(path[0], '*.*'), recursive=True):
-            if f.split(".")[-1] in model_extensions:
-                out.append(f.replace(folder_in + "/", ""))
+    if os.path.isdir(folder_in):
+        for root, dirs, _ in os.walk(folder_in, followlinks=True):
+            dirs[:] = [d for d in dirs if d not in blacklist_folders]
+            for d in dirs:
+                out.append(os.path.relpath(os.path.join(root, d), folder_in))
     return out

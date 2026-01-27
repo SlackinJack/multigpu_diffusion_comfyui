@@ -1,6 +1,7 @@
 import base64
 import copy
 import errno
+import gc
 import json
 import os
 import psutil
@@ -15,121 +16,170 @@ from torchvision.transforms import ToPILImage, ToTensor
 
 
 from ..multigpu_diffusion.modules.utils import *
-from ..nodes.globals import *
-from ..nodes.nodes_general import *
+from ..nodes.data_types import *
 
 
-configs = {}
-#{
-#    "port": {
-#        "host_process": host_process,
-#        "loaded_backend": backend,
-#        "last_config": last_config,
-#    }
-#}
+LOCAL_HOST = "http://localhost:"
 
 
-def launch_host(config, backend, bar):
-    global cwd, configs
-    closed = False
+class HostManager:
+    configs = {}
+    #{
+    #    "port": {
+    #        "process": process,
+    #        "backend": backend,
+    #        "last_config": last_config,
+    #        "pipeline": pipeline,
+    #        "closed": BOOLEAN,
+    #    }
+    #}
 
-    port = config.get("port")
-    current_config = configs.get(str(port))
-    if current_config is None:
-        closed = True
-    else:
-        host_process = current_config.get("host_process")
-        loaded_backend = current_config.get("loaded_backend")
-        last_config = current_config.get("last_config")
 
-        if host_process is None or loaded_backend is None or last_config is None:
-            close_host_process(port, host_process, "Invalid host configuration", wait_for_close=True)
+    def __get_config_by_address(self, address):
+        port = address.replace(LOCAL_HOST, "")
+        c = self.configs.get(port)
+        if c is not None:
+            if c["closed"] == True and c["pipeline"] is not None:
+                pipeline_to_load = copy.deepcopy(c["pipeline"])
+                if c.get("last_config") is None:
+                    self.close_host_process(address, "Misconfigured host", wait_for_close=True, with_assert="Misconfigured host.")
+                self.launch_host(c["last_config"])
+                self.post_to_address(LOCAL_HOST+port, "apply", pipeline_to_load)
+        return self.configs[port]
+
+
+    def __set_config_for_address(self, address, config):
+        if LOCAL_HOST in address: address = address.replace(LOCAL_HOST, "")
+        self.configs[address] = config
+        return
+
+
+    def __update_config_pipeline(self, address, value):
+        config = self.__get_config_by_address(address)
+        config["pipeline"] = value
+        return
+
+
+    def get_from_address(self, address, endpoint):
+        if not LOCAL_HOST in address: address = LOCAL_HOST + address
+        result = requests.get(f"{address}/{endpoint}")
+
+        # clean up after request
+        torch.cuda.memory.empty_cache()
+        gc.collect()
+
+        return result
+
+
+    def post_to_address(self, address, endpoint, data):
+        if not LOCAL_HOST in address: address = LOCAL_HOST + address
+        match endpoint:
+            case "apply":   self.__update_config_pipeline(address, data)
+            case _:         pass
+
+        result = None
+        try:                result = requests.post(f"{address}/{endpoint}", json=data)
+        except:             self.close_host_process(address, "Server did not respond", with_assert="Server did not respond.\nCheck console for details.")
+
+        # clean up after request
+        torch.cuda.memory.empty_cache()
+        gc.collect()
+
+        return result
+
+
+    def launch_host(self, config):
+        closed = False
+
+        port = str(config.get("port"))
+        backend = config.get("backend")
+        current_config = self.configs.get(str(port))
+        if current_config is None:
             closed = True
+        else:
+            process, backend, last_config, is_closed = current_config.get("process"), current_config.get("backend"), current_config.get("last_config"), current_config.get("closed")
 
-        if not closed and (loaded_backend != backend or len(loaded_backend) == 0):
-            close_host_process(port, host_process, "Backend changed", wait_for_close=True)
-            closed = True
+            if is_closed:
+                closed = True
 
-        if not closed:
-            for k, v in last_config.items():
-                if k not in config:
-                    close_host_process(port, host_process, "Updated configuration", wait_for_close=True)
-                    closed = True
-                    break
-                if str(config[k]) != str(v):
-                    close_host_process(port, host_process, "Updated configuration", wait_for_close=True)
-                    closed = True
-                    break
+            if not closed and (process is None or backend is None or last_config is None):
+                self.close_host_process(port, "Invalid host configuration")
+                closed = True
 
-    if not closed:
-        bar.update_absolute(33)
-    else:
-        cmd = [
-            "torchrun",
-            f'--nproc_per_node={config["nproc_per_node"]}',
-            f'--master-port={config["master_port"]}',
-            f'{cwd}/../multigpu_diffusion/host_{backend}.py',
-            f'--port={config["port"]}'
-        ]
+            if not closed and (backend != backend or len(backend) == 0):
+                self.close_host_process(port, "Backend changed")
+                closed = True
 
-        for k, v in config.items():
-            if k in ["nproc_per_node", "master_port", "port"]: continue
-            if k in GENERIC_CONFIGS_COMFY.keys(): continue
-            if k in ["scheduler", "lora", "control_net", "ip_adapter", "motion_adapter_lora"]:
-                cmd.append(f'--{k}={json.dumps(v)}')
-            else:
-                v = str(v)
-                if v == "True":
-                    cmd.append(f'--{k}')
-                else:
-                    if v == "False":                                                                                continue
-                    if k in ["quantize_unet_to", "quantize_encoder_to", "quantize_misc_to"] and v == "disabled":    continue
-                    if k in ["compile_backend", "compile_mode"] and v == "default":                                 continue
-                    if k in ["compile_options"] and len(v) == 0:                                                    continue
-                    cmd.append(f'--{k}={str(v)}')
+            if not closed:
+                for k, v in last_config.items():
+                    if k not in config:
+                        self.close_host_process(port, "Updated configuration")
+                        closed = True
+                        break
+                    if str(v) != str(config[k]):
+                        self.close_host_process(port, "Updated configuration")
+                        closed = True
+                        break
+                for k, v in config.items():
+                    if k not in last_config:
+                        self.close_host_process(port, "Updated configuration")
+                        closed = True
+                        break
 
-        # launch host
-        cmd_str = ""
-        for c in cmd: cmd_str += '\n' + c
-        print(f'Starting host:{str(cmd_str)}')
-        host_process = subprocess.Popen(cmd)
-        configs[str(port)] = {
-            "host_process": host_process,
-            "loaded_backend": backend,
+        if backend in ["balanced"]:
+            cmd = ["python3", f'{get_node_dir()}/multigpu_diffusion/host_{backend}.py', f'--port={port}']
+        else:
+            cmd = ["torchrun", f'--nproc_per_node={config["nproc_per_node"]}', f'--master-port={config["master_port"]}', f'{get_node_dir()}/multigpu_diffusion/host_{backend}.py', f'--port={port}']
+
+        if len(config["cuda_visible_devices"]) > 0:
+            os.environ["CUDA_VISIBLE_DEVICES"] = config["cuda_visible_devices"]
+        else:
+            os.environ["CUDA_VISIBLE_DEVICES"] = ""
+            os.environ.pop("CUDA_VISIBLE_DEVICES")
+
+        print(f'Starting host:{str(cmd)}')
+        process = subprocess.Popen(cmd)
+        new_config = {
+            "process": process,
+            "backend": backend,
             "last_config": config,
+            "closed": False,
+            "pipeline": None,
         }
-        timeout = config.get("pipeline_init_timeout")
-        check_host_process(host_process, port, timeout, bar)
-        bar.update_absolute(33)
-    return
+        self.__set_config_for_address(port, new_config)
+
+        current = 0
+        while True:
+            try:
+                response = self.get_from_address(LOCAL_HOST + port, "initialize")
+                if response.status_code == 200:
+                    break
+            except requests.exceptions.RequestException:
+                pass
+            time.sleep(1)
+            current += 1
+            if current >= 30:
+                self.close_host_process(port, "Timed out", with_assert="Failed to launch host within 30 seconds.\nCheck console for details.")
+
+        # clean up after host launch
+        torch.cuda.memory.empty_cache()
+        gc.collect()
+
+        return f"{LOCAL_HOST}{port}"
 
 
-def check_host_process(host_process, port, timeout, bar):
-    global configs
-    current = 0
-    while True:
-        try:
-            response = requests.get(f"http://localhost:{port}/initialize")
-            if response.status_code == 200:
-                bar.update_absolute(33)
-                return
-        except requests.exceptions.RequestException:
-            pass
-        bar.update_absolute(current / timeout * 33)
-        time.sleep(1)
-        current += 1
-        if current >= timeout:
-            close_host_process(port, host_process, "Timed out", wait_for_close=True)
-            assert False, f'Failed to launch host within {timeout} seconds.\nCheck console for details.'
+    def close_host_process(self, port, reason, wait_for_close=True, with_assert=None):
+        if LOCAL_HOST in port: port = port.replace(LOCAL_HOST, "")
 
+        try: self.get_from_address(LOCAL_HOST+port, "close")
+        except: pass
 
-def close_host_process(port, host_process, reason, wait_for_close=False):
-    global configs
-    if host_process is not None:
+        config = self.configs.get(port)
+        process = config.get("process")
         if wait_for_close:  print(f'Synchronously stopping host process ({reason})')
         else:               print(f'Stopping host process ({reason})')
-        def close(port, host_process):
-            host = psutil.Process(host_process.pid)
+        def close(port, process):
+            host = psutil.Process(process.pid)
             workers = [host] + host.children(recursive=True)
             while True:
                 for w in workers:
@@ -137,71 +187,54 @@ def close_host_process(port, host_process, reason, wait_for_close=False):
                 try:
                     time.sleep(3)
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    s.bind(("localhost", port))
+                    s.bind(("localhost", int(port)))
                     time.sleep(1)
                     s.close()
-                    if configs.get(str(port)) is not None: del configs[str(port)]
+                    if self.configs.get(port) is not None: self.configs[port]["closed"] = True
                     print('Host has been stopped')
                     return
                 except socket.error as e:
                     if e.errno == errno.EADDRINUSE:
-                        print('Host still active - waiting to retry')
+                        print('Host still active - waiting for exit')
                         time.sleep(3)
                 except Exception as ex:
-                    print(f'Error occurred - waiting to retry\n{str(ex)}')
+                    print(f'Error occurred - waiting for exit\n{str(ex)}')
                     time.sleep(3)
-        if not wait_for_close:  threading.Thread(target=close, args=(port, host_process,)).start()
-        else:                   close(port, host_process)
-    return
+        if not wait_for_close:      threading.Thread(target=close, args=(port, process,)).start()
+        else:                       close(port, process)
+
+        # clean up after closing host
+        torch.cuda.memory.empty_cache()
+        gc.collect()
+
+        if with_assert is not None: assert False, with_assert
+        return
 
 
-def get_result(port, data, bar):
-    global configs
-    assert configs.get(str(port)) is not None, "Host not initialized."
-    host_process = configs[str(port)]["host_process"]
-    last_config = configs[str(port)]["last_config"]
-    run = True
+    def get_result(self, address, data):
+        config = self.__get_config_by_address(address)
+        process = config["process"]
+        last_config = config["last_config"]
+        port = address.replace(LOCAL_HOST, "")
 
-    def get_progress():
-        while True:
-            nonlocal bar, run
-            if run:
-                try:
-                    progress = requests.get(f"http://localhost:{port}/progress")
-                    if progress is not None and progress.text is not None:
-                        bar.update_absolute(33 + (float(progress.text) / 100 * 67))
-                except Exception as e:
-                    pass
-                time.sleep(5)
+        try:
+            response = self.post_to_address(address, "generate", data)
+        except requests.exceptions.ConnectionError as e0:
+            self.close_host_process(port, "Connection error", with_assert="Connection error.\nCheck console for details.")
+        except Exception as e1:
+            self.close_host_process(port, "Exception occurred while connecting", with_assert="Exception occurred while connecting.\nCheck console for details.")
+
+        try:
+            response_data = response.json()
+            output_image_b64 = response_data.get("output")
+            output_latent_b64 = response_data.get("latent")
+            if output_image_b64 is None and output_latent_b64 is None:
+                assert response_data is not None, "No response from host.\nCheck console for details."
+                assert False, response_data.get("message")
             else:
-                return
-
-    prog_thread = threading.Thread(target=get_progress)
-    prog_thread.start()
-
-    try:
-        response = requests.post(f"http://localhost:{port}/generate", json=data)
-    except Exception as e:
-        close_host_process(port, host_process, "Connection error", wait_for_close=True)
-        assert False, f"Could not post request to host.\nCheck console for details.\n\n{str(e)}"
-
-    run = False
-    bar.update_absolute(100)
-
-    try:
-        response_data = response.json()
-        output_image_b64 = response_data.get("output")
-        output_latent_b64 = response_data.get("latent")
-        if last_config is not None and not last_config["keepalive"]:
-            close_host_process(port, host_process, "Keepalive option off", wait_for_close=last_config["wait_for_host_close"])
-        if output_image_b64 is None and output_latent_b64 is None:
-            assert response_data is not None, "No response from host.\nCheck console for details."
-            assert False, response_data.get("message")
-        else:
-            if output_latent_b64 is not None:   return output_image_b64, output_latent_b64
-            else:                               return output_image_b64
-    except Exception as e:
-        run = False
-        close_host_process(port, host_process, "Unknown error", wait_for_close=True)
-        assert False, f"An error occurred while generating image.\nCheck console for details.\n\n{str(e)}"
+                if output_latent_b64 is not None:   return output_image_b64, output_latent_b64
+                else:                               return output_image_b64
+        except Exception as e:
+            run = False
+            self.close_host_process(port, "Unknown error", with_assert=f"An error occurred while generating image.\nCheck console for details.\n\n{str(e)}")
 
