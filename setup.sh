@@ -8,7 +8,7 @@ rm -r multigpu_diffusion
 echo ""
 echo "########## Clone multigpu_diffusion ##########"
 echo ""
-git clone https://github.com/slackinjack/multigpu_diffusion
+git clone https://github.com/slackinjack/multigpu_diffusion --depth=1
 
 
 

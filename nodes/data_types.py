@@ -29,7 +29,7 @@ LATENT = ("LATENT",)
 VARIANT = (["bf16", "fp16", "fp32"], { "default": "fp16" })
 NPROC_PER_NODE = ("INT", { "default": 2, "min": 2, "max": INT_MAX, "step": 1 })
 COMPEL_MODEL_LIST = (["sd1", "sd2", "sdxl"], { "default": "sdxl" })
-SUPPORTED_MODEL_LIST = (["ad", "sd1", "sd2", "sd3", "sdup", "sdxl", "svd"], { "default": "sdxl" })
+SUPPORTED_MODEL_LIST = (["flux", "sd1", "sd2", "sd3", "sdup", "sdxl", "svd", "want2v", "wani2v", "zimage"], { "default": "sdxl" }) # "ad"
 
 
 CHECKPOINT = ("MD_CHECKPOINT",)
@@ -41,68 +41,46 @@ MODEL_CONFIG = ("MD_MODEL_CONFIG",)
 MODEL_CONFIG_LIST = (model_configs,)
 LORA = ("MD_LORA",)
 LORA_LIST = (loras,)
-LORA_WEIGHT = ("FLOAT", { "default": 1.000, "min": INT_MIN, "max": INT_MAX, "step": 0.001 })
+LORA_WEIGHT = ("FLOAT", { "default": 1.00000, "min": INT_MIN, "max": INT_MAX, "step": 0.00001 })
 
 
 HOST = ("MD_HOST",)
 HOST_CONFIG = ("MD_HOST_CONFIG",)
+BACKEND_CONFIG = ("MD_BACKEND_CONFIG",)
 BACKEND = (["asyncdiff", "balanced"], { "default": "asyncdiff" })
 PORT = ("INT", { "default": 6000, "min": 1025, "max": 65535, "step": 1 })
 MASTER_PORT = ("INT", { "default": 29400, "min": 1025, "max": 65535, "step": 1 })
 PIPELINE_INIT_TIMEOUT = ("INT", { "default": 600, "min": 0, "max": INT_MAX, "step": 1 })
 
 
-MODEL_QUANT_CONFIG = ("MD_MODEL_QUANT_CONFIG",)
-QUANT_CONFIG = ("MD_QUANT_CONFIG",)
-BNB_QUANTS = (["int4", "int8"], { "default": "int8" })
-BNB_QUANT_TYPES = (["nf4", "fp4"], { "default": "nf4" })
-BNB_QUANT_STORAGE_TYPES = (["bf16", "fp8", "fp16", "fp32", "fp64", "cp32", "cp64", "cp128", "int1", "int2", "int3", "int4", "int5", "int6", "int7", "int8", "int16", "int32", "int64","bool"], { "default": "fp16" })
-TAO_QUANTS = (["int4wo", "int4dq", "int8wo", "int8dq", "uint1wo", "uint2wo", "uint3wo", "uint4wo", "uint5wo", "uint6wo", "uint7wo", "float8wo"], { "default": "int8dq" })
+SCHEDULER               = ("MD_SCHEDULER",)
+FM_EULER_SCHEDULER      = ("MD_FM_EULER_SCHEDULER",)
+MODEL_QUANT_CONFIG      = ("MD_MODEL_QUANT_CONFIG",)
+QUANT_CONFIG            = ("MD_QUANT_CONFIG",)
+TORCH_CONFIG            = ("MD_TORCH_CONFIG",)
+GROUP_OFFLOAD_CONFIG    = ("MD_GROUP_OFFLOAD_CONFIG",)
+OFFLOAD_CONFIG          = ("MD_OFFLOAD_CONFIG",)
+COMPILE_CONFIG          = ("MD_COMPILE_CONFIG",)
 
 
-TORCH_CONFIG = ("MD_TORCH_CONFIG",)
-TORCH_CACHE_LIMIT = ("INT", { "default": 16, "min": 0, "max": INT_MAX, "step": 1 })
-TORCH_ACCUMULATED_CACHE_LIMIT = ("INT", { "default": 128, "min": 0, "max": INT_MAX, "step": 1 })
-
-
-COMPILE_CONFIG = ("MD_COMPILE_CONFIG",)
-COMPILE_BACKENDS = (["default", "inductor", "eager"], { "default": "default" })
-COMPILE_MODES = (["default", "reduce-overhead", "max-autotune", "max-autotune-no-cudagraphs"], { "default": "default" })
-
-
-PROMPT = ("STRING", { "default": "", "multiline": True })
-RESOLUTION = ("INT", { "default": 512, "min": 8, "max": INT_MAX, "step": 8 })
-SEED = ("INT", { "default": 0, "min": 0, "max": INT_MAX, "step": 1 })
-STEPS = ("INT", { "default": 60, "min": 1, "max": INT_MAX, "step": 1 })
-CLIP_SKIP = ("INT", { "default": 0, "min": 0, "max": INT_MAX, "step": 1 })
-DENOISING_START_STEP = ("INT", { "default": 0, "min": 0, "max": INT_MAX, "step": 1 })
-DENOISING_END_STEP = ("INT", { "default": INT_MAX, "min": 1, "max": INT_MAX, "step": 1 })
-CFG = ("FLOAT", { "default": 7.000, "min": 0, "max": INT_MAX, "step": 0.001 })
-IP_ADAPTER_SCALE = ("FLOAT", { "default": 0.5000, "min": 0.0000, "max": INT_MAX, "step": 0.0001 })
-CONTROLNET_SCALE = ("FLOAT", { "default": 0.5000, "min": 0.0000, "max": INT_MAX, "step": 0.0001 })
-
-
-SCHEDULER = ("MD_SCHEDULER",)
-SCHEDULER_LIST = (["ddim", "ddpm", "deis", "dpm_2", "dpm_2_a", "dpm_sde", "dpmpp_2m", "dpmpp_2m_sde", "dpmpp_sde", "euler", "euler_a", "heun", "ipndm", "lms", "pndm", "tcd", "unipc"], { "default": "ddim" })
-TIMESTEP_LIST = (["default", "leading", "linspace", "trailing"], { "default": "default" })
-BETA_LIST = (["default", "linear", "scaled_linear", "squaredcos_cap_v2"], { "default": "default" })
-BETA_START = ("FLOAT", { "default": 0.00010, "min": 0.00000, "max": 1.00000, "step": 0.00001 })
-BETA_END = ("FLOAT", { "default": 0.02000, "min": 0.00000, "max": 1.00000, "step": 0.00001 })
+PROMPT                  = ("STRING", { "default": "", "multiline": True })
+RESOLUTION              = ("INT", { "default": 512, "min": 8, "max": INT_MAX, "step": 8 })
+SEED                    = ("INT", { "default": 0, "min": 0, "max": INT_MAX, "step": 1 })
+STEPS                   = ("INT", { "default": 60, "min": 1, "max": INT_MAX, "step": 1 })
+CLIP_SKIP               = ("INT", { "default": 0, "min": 0, "max": INT_MAX, "step": 1 })
+DENOISING_START_STEP    = ("INT", { "default": 0, "min": 0, "max": INT_MAX, "step": 1 })
+DENOISING_END_STEP      = ("INT", { "default": INT_MAX, "min": 1, "max": INT_MAX, "step": 1 })
+CFG                     = ("FLOAT", { "default": 7.00000, "min": 0, "max": INT_MAX, "step": 0.00001 })
+IP_ADAPTER_SCALE        = ("FLOAT", { "default": 0.50000, "min": 0.00000, "max": INT_MAX, "step": 0.00001 })
+CONTROLNET_SCALE        = ("FLOAT", { "default": 0.50000, "min": 0.00000, "max": INT_MAX, "step": 0.00001 })
 
 
 # SVD
-DECODE_CHUNK_SIZE = ("INT", { "default": 8, "min": 1, "max": INT_MAX, "step": 1 })
-NUM_FRAMES = ("INT", { "default": 25, "min": 1, "max": INT_MAX, "step": 1 })
-MOTION_BUCKET_ID = ("INT", { "default": 180, "min": 1, "max": INT_MAX, "step": 1 })
-NOISE_AUG_STRENGTH = ("FLOAT", { "default": 0.001, "min": INT_MIN, "max": INT_MAX, "step": 0.001 })
-SCALE_PERCENTAGE = ("FLOAT", { "default": 100.000, "min": 0.001, "max": INT_MAX, "step": 0.001 })
-
-
-BACKEND_CONFIG = ("MD_BACKEND_CONFIG",)
-MODEL_N = ("INT", { "default": 2, "min": 1, "max": INT_MAX, "step": 1 })
-STRIDE = ("INT", { "default": 1, "min": 1, "max": INT_MAX, "step": 1 })
-SYNCED_STEPS = ("INT", { "default": 10, "min": 0, "max": INT_MAX, "step": 1 })
-SYNCED_PERCENT = ("FLOAT", { "default": 10.000, "min": 0, "max": 100, "step": 0.001 })
+DECODE_CHUNK_SIZE       = ("INT", { "default": 8, "min": 1, "max": INT_MAX, "step": 1 })
+NUM_FRAMES              = ("INT", { "default": 25, "min": 1, "max": INT_MAX, "step": 1 })
+MOTION_BUCKET_ID        = ("INT", { "default": 180, "min": 1, "max": INT_MAX, "step": 1 })
+NOISE_AUG_STRENGTH      = ("FLOAT", { "default": 0.00001, "min": INT_MIN, "max": INT_MAX, "step": 0.00001 })
+SCALE_PERCENTAGE        = ("FLOAT", { "default": 100.00000, "min": 0.00001, "max": INT_MAX, "step": 0.00001 })
 
 
 ROOT_CATEGORY = "MultiGPU Diffusion"

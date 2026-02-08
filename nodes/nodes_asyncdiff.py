@@ -9,11 +9,11 @@ from ..multigpu_diffusion.modules.utils import *
 
 
 ASYNCDIFF_CONFIGS = {
-    "model_n": MODEL_N,
-    "stride": STRIDE,
-    "time_shift": BOOLEAN_DEFAULT_FALSE,
-    "synced_steps": SYNCED_STEPS,
-    "synced_percent": SYNCED_PERCENT,
+    "model_n":          ("INT", { "default": 2, "min": 1 }),
+    "stride":           ("INT", { "default": 1, "min": 1 }),
+    "time_shift":       BOOLEAN_DEFAULT_FALSE,
+    "synced_steps":     ("INT", { "default": 10, "min": 0 }),
+    "synced_percent":   ("FLOAT", { "default": 10.00000, "min": 0, "max": 100, "step": 0.00001 }),
 }
 
 

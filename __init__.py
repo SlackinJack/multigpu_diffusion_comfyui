@@ -8,6 +8,7 @@ NODE_CLASS_MAPPINGS = {
     "CheckpointSelector": CheckpointSelector,
     "SchedulerSelector": SchedulerSelector,
     "AdvancedSchedulerSelector": AdvancedSchedulerSelector,
+    "AdvancedFMSchedulerSelector": AdvancedFMSchedulerSelector,
     "ModelSelector": ModelSelector,
     "UnsafeModelSelector": UnsafeModelSelector,
     "LoraSelector": LoraSelector,
@@ -18,10 +19,14 @@ NODE_CLASS_MAPPINGS = {
     "AsyncDiffConfig": AsyncDiffConfig,
     "BalancedConfig": BalancedConfig,
     "BNBQuantizationConfig": BNBQuantizationConfig,
+    "QTOQuantizationConfig": QTOQuantizationConfig,
+    "SNQQuantizationConfig": SNQQuantizationConfig,
     "TAOQuantizationConfig": TAOQuantizationConfig,
     "TorchConfig": TorchConfig,
     "CompileConfig": CompileConfig,
     "QuantizationConfig": QuantizationConfig,
+    "GroupOffloadConfig": GroupOffloadConfig,
+    "OffloadConfig": OffloadConfig,
 
     "CreateHost": CreateHost,
     "CloseHost": CloseHost,
@@ -30,8 +35,11 @@ NODE_CLASS_MAPPINGS = {
 
     # "ADSampler": ADSampler,
     "SDSampler": SDSampler,
+    "SDSamplerPrompt": SDSamplerPrompt,
     "SDUpscaleSampler": SDUpscaleSampler,
     "SVDSampler": SVDSampler,
+    "WanSampler": WanSampler,
+    "ZImageSampler": ZImageSampler,
 }
 
 
@@ -39,6 +47,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "CheckpointSelector": "CheckpointSelector",
     "SchedulerSelector": "SchedulerSelector",
     "AdvancedSchedulerSelector": "AdvancedSchedulerSelector",
+    "AdvancedFMSchedulerSelector": "AdvancedFMSchedulerSelector",
     "ModelSelector": "ModelSelector",
     "UnsafeModelSelector": "UnsafeModelSelector",
     "LoraSelector": "LoraSelector",
@@ -49,10 +58,14 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AsyncDiffConfig": "AsyncDiffConfig",
     "BalancedConfig": "BalancedConfig",
     "BNBQuantizationConfig": "BNBQuantizationConfig",
+    "QTOQuantizationConfig": "QTOQuantizationConfig",
+    "SNQQuantizationConfig": "SNQQuantizationConfig",
     "TAOQuantizationConfig": "TAOQuantizationConfig",
     "TorchConfig": "TorchConfig",
     "CompileConfig": "CompileConfig",
     "QuantizationConfig": "QuantizationConfig",
+    "GroupOffloadConfig": "GroupOffloadConfig",
+    "OffloadConfig": "OffloadConfig",
 
     "CreateHost": "CreateHost",
     "CloseHost": "CloseHost",
@@ -61,8 +74,11 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 
     # "ADSampler": "ADSampler",
     "SDSampler": "SDSampler",
+    "SDSamplerPrompt": "SDSampler (Using Prompt)",
     "SDUpscaleSampler": "SDUpscaleSampler",
     "SVDSampler": "SVDSampler",
+    "WanSampler": "WanSampler",
+    "ZImageSampler": "ZImageSampler",
 }
 
 

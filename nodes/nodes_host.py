@@ -1,4 +1,5 @@
 import os
+import time
 
 
 from comfy.utils import ProgressBar
@@ -23,8 +24,8 @@ class CreateHost:
     RETURN_TYPES, FUNCTION, CATEGORY = HOST, "create_host", ROOT_CATEGORY_GENERAL
     def create_host(self, **kwargs):
         global hm
-        address = hm.launch_host(kwargs)
-        return (address,)
+        host = hm.launch_host(kwargs)
+        return (host,)
 
 
 class CloseHost:
@@ -46,7 +47,7 @@ class ApplyPipeline:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "address": HOST,
+                "host": HOST,
                 "backend_config": BACKEND_CONFIG,
                 "checkpoint": MODEL,
                 "pipeline_type": SUPPORTED_MODEL_LIST,
@@ -54,56 +55,60 @@ class ApplyPipeline:
                 "vae_fp16": BOOLEAN_DEFAULT_FALSE,
                 "enable_vae_tiling": BOOLEAN_DEFAULT_FALSE,
                 "enable_vae_slicing": BOOLEAN_DEFAULT_FALSE,
+                "enable_attention_slicing": BOOLEAN_DEFAULT_FALSE,
                 "xformers_efficient": BOOLEAN_DEFAULT_FALSE,
-                "enable_model_cpu_offload": BOOLEAN_DEFAULT_FALSE,
-                "enable_sequential_cpu_offload": BOOLEAN_DEFAULT_FALSE,
             },
             "optional": {
                 "lora": LORA,
+                "transformer": MODEL,
                 "vae": MODEL,
                 "control_net": MODEL,
                 "ip_adapter": MODEL,
+                "text_encoder": MODEL,
+                "text_encoder_2": MODEL,
+                "text_encoder_3": MODEL,
                 # "motion_module": MODEL,
                 # "motion_adapter": MODEL,
                 # "motion_adapter_lora": MOTION_ADAPTER_LORA,
                 "compile_config": COMPILE_CONFIG,
                 "quantization_config": QUANT_CONFIG,
                 "torch_config": TORCH_CONFIG,
+                "group_offload_config": GROUP_OFFLOAD_CONFIG,
             },
         }
     RETURN_TYPES, FUNCTION, CATEGORY = HOST, "apply_pipeline", ROOT_CATEGORY_CONFIG
     def apply_pipeline(self, **kwargs):
         global hm
-        address = kwargs.pop("address")
+        host = kwargs.pop("host")
         data = {}
         for k,v in kwargs.items():
-            if k not in ["checkpoint", "vae", "control_net", "ip_adapter", "motion_module", "motion_adapter"]:
+            if k not in ["checkpoint", "transformer", "vae", "control_net", "ip_adapter", "motion_module", "motion_adapter", "text_encoder", "text_encoder_2", "text_encoder_3"]:
                 data[k] = v
                 continue
             else:
                 if v.get("checkpoint") is not None:
-                    data[k] = os.path.join(get_models_dir(), v["checkpoint"])
+                    data[k] = { "checkpoint": os.path.join(get_models_dir(), v["checkpoint"]) }
                     continue
                 else:
-                    data[k] = os.path.join(get_models_dir(), v["model"])
-                    data[k + "_config"] = os.path.join(get_models_dir(), v["config"])
+                    data[k] = { "model": os.path.join(get_models_dir(), v["model"]), "config": os.path.join(get_models_dir(), v["config"]) }
                     continue
-        response = hm.post_to_address(address, "apply", data)
-        if response.status_code != 200:
-            hm.close_host_process(address, "Failed to initialize pipeline", with_assert="Failed to initialize pipeline.\n\nCheck console for details.")
-        return (address,)
+
+        response = hm.post_to_address(host, "apply", data)
+        if response is None or response.status_code != 200:
+            hm.close_host_process(host, "Failed to initialize pipeline", with_assert="Failed to initialize pipeline.\n\nCheck console for details.")
+        return (host,)
 
 
 class OffloadPipeline:
     @classmethod
     def INPUT_TYPES(s): return {
-        "required": { "address": HOST },
+        "required": { "host": HOST },
         "optional": { "image": IMAGE, "latent": LATENT },
     }
     RETURN_TYPES, FUNCTION, CATEGORY = ("MD_HOST", "IMAGE", "LATENT",), "offload_pipeline", ROOT_CATEGORY_CONFIG
-    def offload_pipeline(self, address, image=None, latent=None):
+    def offload_pipeline(self, host, image=None, latent=None):
         global hm
         assert not (image is None and latent is None), "An output needs to be chained to this node in order for this node to work"
-        response = hm.get_from_address(address, "offload")
+        response = hm.get_from_address(host, "offload")
         # TODO: maybe do something with response
-        return (address, image, latent,)
+        return (host, image, latent,)
