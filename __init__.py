@@ -1,7 +1,10 @@
-from .nodes.nodes_general import *
-from .nodes.nodes_host import *
 from .nodes.nodes_asyncdiff import *
 from .nodes.nodes_balanced import *
+from .nodes.nodes_general import *
+from .nodes.nodes_host import *
+from .nodes.nodes_quantization import *
+from .nodes.nodes_sampler import *
+from .nodes.nodes_scheduler import *
 
 
 NODE_CLASS_MAPPINGS = {

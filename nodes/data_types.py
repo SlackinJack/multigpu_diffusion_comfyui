@@ -91,15 +91,6 @@ ROOT_CATEGORY_SAMPLERS = f"{ROOT_CATEGORY}/Samplers"
 ASYNCDIFF_CATEGORY = f"{ROOT_CATEGORY_SAMPLERS}/AsyncDiff"
 
 
-HOST_CONFIGS = {
-    "port": PORT,
-    "master_port": MASTER_PORT,
-    "nproc_per_node": NPROC_PER_NODE,
-    "backend": BACKEND,
-    "cuda_visible_devices": ("STRING", { "default": "", "multiline": False }),
-}
-
-
 def trilean(value):
     if value == "true": return True
     if value == "false": return False

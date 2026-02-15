@@ -20,9 +20,19 @@ def get_current_manager():
 
 class CreateHost:
     @classmethod
-    def INPUT_TYPES(s): return { "required": HOST_CONFIGS }
+    def INPUT_TYPES(s): return {
+        "required": {
+            "port": PORT,
+            "master_port": MASTER_PORT,
+            "nproc_per_node": NPROC_PER_NODE,
+            "backend": BACKEND,
+            "cuda_visible_devices": ("STRING", { "default": "", "multiline": False }),
+            "s33d": SEED,
+        }
+    }
     RETURN_TYPES, FUNCTION, CATEGORY = HOST, "create_host", ROOT_CATEGORY_GENERAL
     def create_host(self, **kwargs):
+        kwargs.pop("s33d")
         global hm
         host = hm.launch_host(kwargs)
         return (host,)
