@@ -146,11 +146,19 @@ class HostManager:
             case _:
                 raise NotImplementedError
 
+        os.environ["OMP_NUM_THREADS"] = "1"
         if len(config["cuda_visible_devices"]) > 0:
             os.environ["CUDA_VISIBLE_DEVICES"] = config["cuda_visible_devices"]
         else:
             os.environ["CUDA_VISIBLE_DEVICES"] = ""
             os.environ.pop("CUDA_VISIBLE_DEVICES")
+
+        # NOTE: comment-out for debug
+        os.environ["TORCH_CPP_LOG_LEVEL"] = "ERROR"
+        os.environ["TORCH_DISTRIBUTED_DEBUG"] = "OFF"
+        os.environ["DIFFUSERS_VERBOSITY"] = "critical"
+        os.environ["DIFFUSERS_NO_ADVISORY_WARNINGS"] = "1"
+        os.environ["PYTHONWARNINGS"] = "ignore"
 
         print(f'Starting host:{str(cmd)}')
         process = subprocess.Popen(cmd)
