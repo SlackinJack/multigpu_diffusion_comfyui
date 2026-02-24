@@ -43,7 +43,7 @@ class AdvancedSchedulerSelector:
         return (scheduler_config,)
 
 
-class AdvancedFMSchedulerSelector:
+class FMEulerScheduler:
     @classmethod
     def INPUT_TYPES(s): return {
         "required": {
@@ -62,7 +62,7 @@ class AdvancedFMSchedulerSelector:
             "stochastic_sampling":      TRILEAN_WITH_DEFAULT,
         }
     }
-    RETURN_TYPES, FUNCTION, CATEGORY = FM_EULER_SCHEDULER, "get", ROOT_CATEGORY_GENERAL
+    RETURN_TYPES, FUNCTION, CATEGORY = FM_SCHEDULER, "get", ROOT_CATEGORY_GENERAL
     def get(self, **kwargs):
         scheduler_config = {"scheduler": "fm_euler"}
         for k, v in kwargs.items():

@@ -2,6 +2,7 @@ from .nodes.nodes_asyncdiff import *
 from .nodes.nodes_balanced import *
 from .nodes.nodes_general import *
 from .nodes.nodes_host import *
+from .nodes.nodes_model import *
 from .nodes.nodes_quantization import *
 from .nodes.nodes_sampler import *
 from .nodes.nodes_scheduler import *
@@ -11,7 +12,7 @@ NODE_CLASS_MAPPINGS = {
     "CheckpointSelector": CheckpointSelector,
     "SchedulerSelector": SchedulerSelector,
     "AdvancedSchedulerSelector": AdvancedSchedulerSelector,
-    "AdvancedFMSchedulerSelector": AdvancedFMSchedulerSelector,
+    "FMEulerScheduler": FMEulerScheduler,
     "ModelSelector": ModelSelector,
     "UnsafeModelSelector": UnsafeModelSelector,
     "LoraSelector": LoraSelector,
@@ -21,10 +22,10 @@ NODE_CLASS_MAPPINGS = {
 
     "AsyncDiffConfig": AsyncDiffConfig,
     "BalancedConfig": BalancedConfig,
-    "BNBQuantizationConfig": BNBQuantizationConfig,
-    "QTOQuantizationConfig": QTOQuantizationConfig,
-    "SNQQuantizationConfig": SNQQuantizationConfig,
-    "TAOQuantizationConfig": TAOQuantizationConfig,
+    "BitsAndBytesQuantizationConfig": BitsAndBytesQuantizationConfig,
+    "QuantoQuantizationConfig": QuantoQuantizationConfig,
+    "SDNQQuantizationConfig": SDNQQuantizationConfig,
+    "TorchAOQuantizationConfig": TorchAOQuantizationConfig,
     "TorchConfig": TorchConfig,
     "CompileConfig": CompileConfig,
     "QuantizationConfig": QuantizationConfig,
@@ -37,6 +38,7 @@ NODE_CLASS_MAPPINGS = {
     "OffloadPipeline": OffloadPipeline,
 
     # "ADSampler": ADSampler,
+    "FluxSampler": FluxSampler,
     "SDSampler": SDSampler,
     "SDSamplerPrompt": SDSamplerPrompt,
     "SDUpscaleSampler": SDUpscaleSampler,
@@ -50,7 +52,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "CheckpointSelector": "CheckpointSelector",
     "SchedulerSelector": "SchedulerSelector",
     "AdvancedSchedulerSelector": "AdvancedSchedulerSelector",
-    "AdvancedFMSchedulerSelector": "AdvancedFMSchedulerSelector",
+    "FMEulerScheduler": "FMEulerScheduler",
     "ModelSelector": "ModelSelector",
     "UnsafeModelSelector": "UnsafeModelSelector",
     "LoraSelector": "LoraSelector",
@@ -60,10 +62,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 
     "AsyncDiffConfig": "AsyncDiffConfig",
     "BalancedConfig": "BalancedConfig",
-    "BNBQuantizationConfig": "BNBQuantizationConfig",
-    "QTOQuantizationConfig": "QTOQuantizationConfig",
-    "SNQQuantizationConfig": "SNQQuantizationConfig",
-    "TAOQuantizationConfig": "TAOQuantizationConfig",
+    "BitsAndBytesQuantizationConfig": "BitsAndBytesQuantizationConfig",
+    "QuantoQuantizationConfig": "QuantoQuantizationConfig",
+    "SDNQQuantizationConfig": "SDNQQuantizationConfig",
+    "TorchAOQuantizationConfig": "TorchAOQuantizationConfig",
     "TorchConfig": "TorchConfig",
     "CompileConfig": "CompileConfig",
     "QuantizationConfig": "QuantizationConfig",
@@ -76,6 +78,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "OffloadPipeline": "OffloadPipeline",
 
     # "ADSampler": "ADSampler",
+    "FluxSampler": "FluxSampler",
     "SDSampler": "SDSampler",
     "SDSamplerPrompt": "SDSampler (Using Prompt)",
     "SDUpscaleSampler": "SDUpscaleSampler",

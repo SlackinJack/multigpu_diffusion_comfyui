@@ -7,6 +7,10 @@ from .nodes_host import get_current_manager
 from ..multigpu_diffusion.modules.utils import *
 
 
+IMAGE_SUCCESS_MESSAGE = "🏁 Successfully created image"
+MULTI_SUCCESS_MESSAGE = "🏁 Successfully created frames"
+
+
 """
 class ADSampler:
     @classmethod
@@ -74,14 +78,13 @@ class ADSampler:
             if controlnet_scale is not None: data["controlnet_scale"] = controlnet_scale
 
         response = get_current_manager().get_result(host, data)
-        if response is not None:
-            images = decode_b64_and_unpickle(response)
-            tensors = []
-            for i in images:
-                tensors.append(convert_image_to_hwc_tensor(i))
-            print("Successfully created media")
-            return (host, torch.stack(tuple(tensors)),)   # HWC -> NHWC
-        assert False, "No media generated.\nCheck console for details."
+        assert response is not None, "No media generated.\nCheck console for details."
+        images = decode_b64_and_unpickle(response)
+        tensors = []
+        for i in images:
+            tensors.append(convert_image_to_hwc_tensor(i))
+        print(MULTI_SUCCESS_MESSAGE)
+        return (host, torch.stack(tuple(tensors)),)   # HWC -> NHWC
 """
 
 
@@ -159,11 +162,10 @@ class SDSampler:
             if controlnet_scale is not None: data["controlnet_scale"] = controlnet_scale
 
         response = get_current_manager().get_result(host, data)
-        if response is not None:
-            image_out, latent_out = response
-            print("Successfully created media")
-            return (host, convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
-        assert False, "No media generated.\nCheck console for details."
+        assert response is not None, "No media generated.\nCheck console for details."
+        image_out, latent_out = response
+        print(IMAGE_SUCCESS_MESSAGE)
+        return (host, convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
 
 
 class SDSamplerPrompt:
@@ -243,11 +245,10 @@ class SDSamplerPrompt:
             if controlnet_scale is not None: data["controlnet_scale"] = controlnet_scale
 
         response = get_current_manager().get_result(host, data)
-        if response is not None:
-            image_out, latent_out = response
-            print("Successfully created media")
-            return (host, convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
-        assert False, "No media generated.\nCheck console for details."
+        assert response is not None, "No media generated.\nCheck console for details."
+        image_out, latent_out = response
+        print(IMAGE_SUCCESS_MESSAGE)
+        return (host, convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
 
 
 class SVDSampler:
@@ -299,14 +300,13 @@ class SVDSampler:
             "noise_aug_strength":   noise_aug_strength,
         }
         response = get_current_manager().get_result(host, data)
-        if response is not None:
-            images = decode_b64_and_unpickle(response)
-            tensors = []
-            for i in images:
-                tensors.append(convert_image_to_hwc_tensor(i))
-            print("Successfully created media")
-            return (host, torch.stack(tuple(tensors)),)   # HWC -> NHWC
-        assert False, "No media generated.\nCheck console for details."
+        assert response is not None, "No media generated.\nCheck console for details."
+        images = decode_b64_and_unpickle(response)
+        tensors = []
+        for i in images:
+            tensors.append(convert_image_to_hwc_tensor(i))
+        print(MULTI_SUCCESS_MESSAGE)
+        return (host, torch.stack(tuple(tensors)),)   # HWC -> NHWC
 
 
 class SDUpscaleSampler:
@@ -346,7 +346,7 @@ class SDUpscaleSampler:
         i = 0
         for im in images:
             i += 1
-            print(f"Upscaling image: {i}/{len(images)}")
+            print(f"⏳ Upscaling image: {i}/{len(images)}")
             b64_image = convert_tensor_to_b64(im)
             data = {
                 "image": b64_image,
@@ -361,19 +361,90 @@ class SDUpscaleSampler:
             try:
                 response = get_current_manager().get_result(host, data)
                 if response is not None:
-                    print(f"Finished upscaling image: {i}/{len(images)}")
+                    print(f"✅ Finished upscaling image: {i}/{len(images)}")
                     im2 = decode_b64_and_unpickle(response)
                     tensors.append(convert_image_to_hwc_tensor(im2))
                 else:
                     if len(images) == 1:
-                        print("No media generated")
+                        print("❌ No media generated")
                     else:
-                        print(f"Error processing image: {i}/{len(images)}")
+                        print(f"❌ Error processing image: {i}/{len(images)}")
             except Exception as e:
-                print("Error getting data from server.")
-                print(str(e))
-        print("Successfully created media")
+                print("❌ Error getting data from server.\n" + str(e))
+        assert len(tensors) > 0, "No media generated.\nCheck console for details."
+        print(IMAGE_SUCCESS_MESSAGE)
         return (host, torch.stack(tuple(tensors)),)       # HWC -> NHWC
+
+
+class FluxSampler:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "host": HOST,
+                "positive": PROMPT,
+                "negative": PROMPT,
+                "width": RESOLUTION,
+                "height": RESOLUTION,
+                "s33d": SEED,
+                "steps": STEPS,
+                "guidance_scale": CFG,
+                # "ip_adapter_scale": IP_ADAPTER_SCALE,
+                # "controlnet_scale": CONTROLNET_SCALE,
+            },
+            "optional": {
+                # "ip_image": IMAGE,
+                # "control_image": IMAGE,
+                "latent": LATENT,
+                "fm_scheduler": FM_SCHEDULER,
+            }
+        }
+
+    RETURN_TYPES, FUNCTION, CATEGORY = ("MD_HOST", "IMAGE", "LATENT",), "generate", ROOT_CATEGORY_SAMPLERS
+
+    def generate(
+        self,
+        host,
+        positive,
+        negative,
+        width,
+        height,
+        s33d,
+        steps,
+        guidance_scale,
+        # ip_adapter_scale,
+        # controlnet_scale,
+        # ip_image=None,
+        # control_image=None,
+        latent=None,
+        fm_scheduler=None,
+    ):
+        data = {
+            "width":            width,
+            "height":           height,
+            "seed":             s33d,
+            "steps":            steps,
+            "cfg":              guidance_scale,
+            "positive":         positive,
+            "negative":         negative,
+        }
+
+        if latent is not None:          data["latent"] = pickle_and_encode_b64(latent["samples"])
+        if fm_scheduler is not None:    data["scheduler"] = json.dumps(fm_scheduler)
+        # if ip_image is not None:
+        #     ip_image = ip_image.squeeze(0)              # NHWC -> HWC
+        #     data["ip_image"] = convert_tensor_to_b64(ip_image)
+        #     if ip_adapter_scale is not None: data["ip_adapter_scale"] = ip_adapter_scale
+        # if control_image is not None:
+        #     control_image = control_image.squeeze(0)    # NHWC -> HWC
+        #     data["control_image"] = convert_tensor_to_b64(control_image)
+        #     if controlnet_scale is not None: data["controlnet_scale"] = controlnet_scale
+
+        response = get_current_manager().get_result(host, data)
+        assert response is not None, "No media generated.\nCheck console for details."
+        image_out, latent_out = response
+        print(IMAGE_SUCCESS_MESSAGE)
+        return (host, convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
 
 
 class WanSampler:
@@ -382,8 +453,6 @@ class WanSampler:
         return {
             "required": {
                 "host": HOST,
-                # "positive_embeds": CONDITIONING,
-                # "negative_embeds": CONDITIONING,
                 "positive": PROMPT,
                 "negative": PROMPT,
                 "width": RESOLUTION,
@@ -391,17 +460,10 @@ class WanSampler:
                 "s33d": SEED,
                 "steps": STEPS,
                 "guidance_scale": CFG,
-                # "clip_skip": CLIP_SKIP,
-                # "denoising_start_step": DENOISING_START_STEP,
-                # "denoising_end_step": DENOISING_END_STEP,
-                # "ip_adapter_scale": IP_ADAPTER_SCALE,
-                # "controlnet_scale": CONTROLNET_SCALE,
                 "num_frames": NUM_FRAMES,
             },
             "optional": {
                 "image": IMAGE,
-                # "ip_image": IMAGE,
-                # "control_image": IMAGE,
                 # "latent": LATENT,
                 # "scheduler": SCHEDULER,
             }
@@ -412,8 +474,6 @@ class WanSampler:
     def generate(
         self,
         host,
-        # positive_embeds,
-        # negative_embeds,
         positive,
         negative,
         width,
@@ -421,15 +481,8 @@ class WanSampler:
         s33d,
         steps,
         guidance_scale,
-        # clip_skip,
-        # denoising_start_step,
-        # denoising_end_step,
-        # ip_adapter_scale,
-        # controlnet_scale,
         num_frames,
         image=None,
-        # ip_image=None,
-        # control_image=None,
         # latent=None,
         # scheduler=None,
     ):
@@ -439,48 +492,26 @@ class WanSampler:
             "seed":             s33d,
             "steps":            steps,
             "cfg":              guidance_scale,
-            # "clip_skip":        clip_skip,
-            # "denoising_start":  denoising_start_step,
-            # "denoising_end":    denoising_end_step,
-            # "positive_embeds":  pickle_and_encode_b64(positive_embeds),
-            # "negative_embeds":  pickle_and_encode_b64(negative_embeds),
             "positive":         positive,
             "negative":         negative,
             "frames":           num_frames,
         }
 
-        """
-        if latent is not None:          data["latent"] = pickle_and_encode_b64(latent["samples"])
-        if scheduler is not None:       data["scheduler"] = json.dumps(scheduler)
-        if ip_image is not None:
-            ip_image = ip_image.squeeze(0)              # NHWC -> HWC
-            data["ip_image"] = convert_tensor_to_b64(ip_image)
-            if ip_adapter_scale is not None: data["ip_adapter_scale"] = ip_adapter_scale
-        if control_image is not None:
-            control_image = control_image.squeeze(0)    # NHWC -> HWC
-            data["control_image"] = convert_tensor_to_b64(control_image)
-            if controlnet_scale is not None: data["controlnet_scale"] = controlnet_scale
-        """
+        # if latent is not None:          data["latent"] = pickle_and_encode_b64(latent["samples"])
+        # if scheduler is not None:       data["scheduler"] = json.dumps(scheduler)
+
         if image is not None:
             image = image.squeeze(0)              # NHWC -> HWC
             data["image"] = convert_tensor_to_b64(image)
 
         response = get_current_manager().get_result(host, data)
-        """
-        if response is not None:
-            image_out, latent_out = response
-            print("Successfully created media")
-            return (host, convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
-        assert False, "No media generated.\nCheck console for details."
-        """
-        if response is not None:
-            images = decode_b64_and_unpickle(response)
-            tensors = []
-            for i in images:
-                tensors.append(convert_image_to_hwc_tensor(i))
-            print("Successfully created media")
-            return (host, torch.stack(tuple(tensors)),)   # HWC -> NHWC
-        assert False, "No media generated.\nCheck console for details."
+        assert response is not None, "No media generated.\nCheck console for details."
+        images = decode_b64_and_unpickle(response)
+        tensors = []
+        for i in images:
+            tensors.append(convert_image_to_hwc_tensor(i))
+        print(MULTI_SUCCESS_MESSAGE)
+        return (host, torch.stack(tuple(tensors)),)   # HWC -> NHWC
 
 
 class ZImageSampler:
@@ -496,9 +527,6 @@ class ZImageSampler:
                 "s33d": SEED,
                 "steps": STEPS,
                 "guidance_scale": CFG,
-                # "clip_skip": CLIP_SKIP,
-                # "denoising_start_step": DENOISING_START_STEP,
-                # "denoising_end_step": DENOISING_END_STEP,
                 # "ip_adapter_scale": IP_ADAPTER_SCALE,
                 # "controlnet_scale": CONTROLNET_SCALE,
             },
@@ -506,7 +534,7 @@ class ZImageSampler:
                 # "ip_image": IMAGE,
                 # "control_image": IMAGE,
                 "latent": LATENT,
-                "scheduler": FM_EULER_SCHEDULER,
+                "fm_scheduler": FM_SCHEDULER,
             }
         }
 
@@ -522,15 +550,12 @@ class ZImageSampler:
         s33d,
         steps,
         guidance_scale,
-        # clip_skip,
-        # denoising_start_step,
-        # denoising_end_step,
         # ip_adapter_scale,
         # controlnet_scale,
         # ip_image=None,
         # control_image=None,
         latent=None,
-        scheduler=None,
+        fm_scheduler=None,
     ):
         data = {
             "width":            width,
@@ -538,15 +563,12 @@ class ZImageSampler:
             "seed":             s33d,
             "steps":            steps,
             "cfg":              guidance_scale,
-            # "clip_skip":        clip_skip,
-            # "denoising_start":  denoising_start_step,
-            # "denoising_end":    denoising_end_step,
             "positive":         positive,
             "negative":         negative,
         }
 
         if latent is not None:          data["latent"] = pickle_and_encode_b64(latent["samples"])
-        if scheduler is not None:       data["scheduler"] = json.dumps(scheduler)
+        if fm_scheduler is not None:    data["scheduler"] = json.dumps(fm_scheduler)
         """
         if ip_image is not None:
             ip_image = ip_image.squeeze(0)              # NHWC -> HWC
@@ -559,8 +581,7 @@ class ZImageSampler:
         """
 
         response = get_current_manager().get_result(host, data)
-        if response is not None:
-            image_out, latent_out = response
-            print("Successfully created media")
-            return (host, convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
-        assert False, "No media generated.\nCheck console for details."
+        assert response is not None, "No media generated.\nCheck console for details."
+        image_out, latent_out = response
+        print(IMAGE_SUCCESS_MESSAGE)
+        return (host, convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)

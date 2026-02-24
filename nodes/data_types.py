@@ -29,7 +29,7 @@ LATENT = ("LATENT",)
 VARIANT = (["bf16", "fp16", "fp32"], { "default": "fp16" })
 NPROC_PER_NODE = ("INT", { "default": 2, "min": 2, "max": INT_MAX, "step": 1 })
 COMPEL_MODEL_LIST = (["sd1", "sd2", "sdxl"], { "default": "sdxl" })
-SUPPORTED_MODEL_LIST = (["flux", "sd1", "sd2", "sd3", "sdup", "sdxl", "svd", "want2v", "wani2v", "zimage"], { "default": "sdxl" }) # "ad"
+SUPPORTED_MODEL_LIST = (["chroma", "flux", "sd1", "sd2", "sd3", "sdup", "sdxl", "svd", "want2v", "wani2v", "zimage"], { "default": "sdxl" }) # "ad"
 
 
 CHECKPOINT = ("MD_CHECKPOINT",)
@@ -54,7 +54,7 @@ PIPELINE_INIT_TIMEOUT = ("INT", { "default": 600, "min": 0, "max": INT_MAX, "ste
 
 
 SCHEDULER               = ("MD_SCHEDULER",)
-FM_EULER_SCHEDULER      = ("MD_FM_EULER_SCHEDULER",)
+FM_SCHEDULER            = ("MD_FM_SCHEDULER",)
 MODEL_QUANT_CONFIG      = ("MD_MODEL_QUANT_CONFIG",)
 QUANT_CONFIG            = ("MD_QUANT_CONFIG",)
 TORCH_CONFIG            = ("MD_TORCH_CONFIG",)

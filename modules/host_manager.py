@@ -1,19 +1,14 @@
-import base64
-import copy
 import errno
-import gc
 import json
 import os
 import psutil
 import requests
-import signal
 import socket
 import subprocess
 import threading
 import time
 import torch
 import traceback
-from torchvision.transforms import ToPILImage, ToTensor
 
 
 from ..multigpu_diffusion.modules.utils import *
@@ -24,21 +19,17 @@ LOCAL_HOST = "http://localhost:"
 
 
 class HostManager:
-
-    def __clean(self):
-        torch.cuda.memory.empty_cache()
-        gc.collect()
+    def __init__(self):
+        self.configs = {}
+        #{
+        #    "port": {
+        #        "process": process,
+        #        "backend": backend,
+        #        "last_config": last_config,
+        #        "pipeline": pipeline,
+        #    }
+        #}
         return
-
-    configs = {}
-    #{
-    #    "port": {
-    #        "process": process,
-    #        "backend": backend,
-    #        "last_config": last_config,
-    #        "pipeline": pipeline,
-    #    }
-    #}
 
 
     def __get_config_by_address(self, address):
@@ -72,10 +63,6 @@ class HostManager:
                 self.close_host_process(address, "Server did not respond")
             else:
                 pass
-
-        # clean up after request
-        self.__clean()
-
         return result
 
 
@@ -88,9 +75,6 @@ class HostManager:
         result = None
         try:                result = requests.post(f"{address}/{endpoint}", json=data)
         except:             self.close_host_process(address, "Server did not respond", with_assert="Server did not respond.\nCheck console for details.")
-
-        # clean up after request
-        self.__clean()
 
         return result
 
@@ -160,7 +144,10 @@ class HostManager:
         os.environ["DIFFUSERS_NO_ADVISORY_WARNINGS"] = "1"
         os.environ["PYTHONWARNINGS"] = "ignore"
 
-        print(f'Starting host:{str(cmd)}')
+        cmd_string = ""
+        for c in cmd: cmd_string += "\n        " + str(c)
+        print(f'🟢 Starting host: {cmd_string}')
+
         process = subprocess.Popen(cmd)
         new_config = {
             "process": process,
@@ -183,9 +170,6 @@ class HostManager:
             if current >= 30:
                 self.close_host_process(port, "Timed out", with_assert="Failed to launch host within 30 seconds.\nCheck console for details.")
 
-        # clean up after host launch
-        self.__clean()
-
         return f"{LOCAL_HOST}{port}"
 
 
@@ -196,11 +180,11 @@ class HostManager:
 
         config = self.configs.get(port)
         if config is None:
-            print('No host config - assuming host is already closed')
+            print(f'❓ No host config - assuming host {port} is already closed')
         else:
             process = config.get("process")
-            if wait_for_close:  print(f'Synchronously stopping host process ({reason})')
-            else:               print(f'Stopping host process ({reason})')
+            if wait_for_close:  print(f'🟡 Synchronously stopping host {port} process - {reason}')
+            else:               print(f'🟡 Stopping host {port} process - {reason}')
             def close(port, process):
                 host = psutil.Process(process.pid)
                 workers = [host] + host.children(recursive=True)
@@ -215,22 +199,19 @@ class HostManager:
                         s.close()
                         if self.configs.get(port) is not None:
                             del self.configs[port]
-                        print('Host has been stopped')
+                        print(f'🛑 Host {port} has been stopped')
                         break
                     except socket.error as e:
                         if e.errno == errno.EADDRINUSE:
-                            print('Host still active - waiting for exit')
+                            print(f'⏳ Host {port} still active - waiting for exit')
                             time.sleep(3)
                     except Exception as ex:
-                        print(f'Error occurred - waiting for exit\n{str(ex)}')
+                        print(f'❌ Error occurred - waiting for host {port} exit\n{str(ex)}')
                         time.sleep(3)
             if not wait_for_close:      threading.Thread(target=close, args=(port, process,)).start()
             else:                       close(port, process)
 
-        # clean up after closing host
-        self.__clean()
-
-        if with_assert is not None: assert False, with_assert
+        assert with_assert is None, with_assert
         return
 
 
@@ -250,14 +231,12 @@ class HostManager:
 
         try:
             response_data = response.json()
+            assert response_data is not None, "No response from host.\nCheck console for details."
             output_image_b64 = response_data.get("output")
             output_latent_b64 = response_data.get("latent")
-            if output_image_b64 is None and output_latent_b64 is None:
-                assert response_data is not None, "No response from host.\nCheck console for details."
-                assert False, response_data.get("message")
-            else:
-                if output_latent_b64 is not None:   return output_image_b64, output_latent_b64
-                else:                               return output_image_b64
+            assert output_image_b64 is not None or output_latent_b64 is not None, response_data.get("message")
+            if output_latent_b64 is not None:   return output_image_b64, output_latent_b64
+            else:                               return output_image_b64
         except Exception as e:
             run = False
             self.close_host_process(port, "Unknown error", with_assert=f"An error occurred while generating image.\nCheck console for details.\n\n{str(e)}")

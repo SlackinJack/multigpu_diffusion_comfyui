@@ -3,7 +3,7 @@ from .nodes_host import get_current_manager
 from ..multigpu_diffusion.modules.utils import *
 
 
-class BNBQuantizationConfig:
+class BitsAndBytesQuantizationConfig:
     @classmethod
     def INPUT_TYPES(s): return {
         "required": {
@@ -25,7 +25,7 @@ class BNBQuantizationConfig:
         return (kwargs,)
 
 
-class QTOQuantizationConfig:
+class QuantoQuantizationConfig:
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -39,7 +39,7 @@ class QTOQuantizationConfig:
         return (kwargs,)
 
 
-class SNQQuantizationConfig:
+class SDNQQuantizationConfig:
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -73,7 +73,7 @@ class SNQQuantizationConfig:
         return (out,)
 
 
-class TAOQuantizationConfig:
+class TorchAOQuantizationConfig:
     @classmethod
     def INPUT_TYPES(s):
         return {
