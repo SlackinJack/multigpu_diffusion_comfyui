@@ -27,7 +27,6 @@ LATENT = ("LATENT",)
 
 
 VARIANT = (["bf16", "fp16", "fp32"], { "default": "fp16" })
-NPROC_PER_NODE = ("INT", { "default": 2, "min": 2, "max": INT_MAX, "step": 1 })
 COMPEL_MODEL_LIST = (["sd1", "sd2", "sdxl"], { "default": "sdxl" })
 SUPPORTED_MODEL_LIST = (["chroma", "flux", "sd1", "sd2", "sd3", "sdup", "sdxl", "svd", "want2v", "wani2v", "zimage"], { "default": "sdxl" }) # "ad"
 
@@ -47,7 +46,7 @@ LORA_WEIGHT = ("FLOAT", { "default": 1.00000, "min": INT_MIN, "max": INT_MAX, "s
 HOST = ("MD_HOST",)
 HOST_CONFIG = ("MD_HOST_CONFIG",)
 BACKEND_CONFIG = ("MD_BACKEND_CONFIG",)
-BACKEND = (["asyncdiff", "balanced"], { "default": "asyncdiff" })
+BACKEND = (["asyncdiff", "balanced", "single"], { "default": "asyncdiff" })
 PORT = ("INT", { "default": 6000, "min": 1025, "max": 65535, "step": 1 })
 MASTER_PORT = ("INT", { "default": 29400, "min": 1025, "max": 65535, "step": 1 })
 PIPELINE_INIT_TIMEOUT = ("INT", { "default": 600, "min": 0, "max": INT_MAX, "step": 1 })

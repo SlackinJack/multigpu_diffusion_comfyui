@@ -6,6 +6,7 @@ from .nodes.nodes_model import *
 from .nodes.nodes_quantization import *
 from .nodes.nodes_sampler import *
 from .nodes.nodes_scheduler import *
+from .nodes.nodes_single import *
 
 
 NODE_CLASS_MAPPINGS = {
@@ -22,6 +23,7 @@ NODE_CLASS_MAPPINGS = {
 
     "AsyncDiffConfig": AsyncDiffConfig,
     "BalancedConfig": BalancedConfig,
+    "SingleConfig": SingleConfig,
     "BitsAndBytesQuantizationConfig": BitsAndBytesQuantizationConfig,
     "QuantoQuantizationConfig": QuantoQuantizationConfig,
     "SDNQQuantizationConfig": SDNQQuantizationConfig,
@@ -62,6 +64,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 
     "AsyncDiffConfig": "AsyncDiffConfig",
     "BalancedConfig": "BalancedConfig",
+    "SingleConfig": "SingleConfig",
     "BitsAndBytesQuantizationConfig": "BitsAndBytesQuantizationConfig",
     "QuantoQuantizationConfig": "QuantoQuantizationConfig",
     "SDNQQuantizationConfig": "SDNQQuantizationConfig",

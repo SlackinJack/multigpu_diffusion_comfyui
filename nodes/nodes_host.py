@@ -24,7 +24,6 @@ class CreateHost:
         "required": {
             "port": PORT,
             "master_port": MASTER_PORT,
-            "nproc_per_node": NPROC_PER_NODE,
             "backend": BACKEND,
             "cuda_visible_devices": ("STRING", { "default": "", "multiline": False }),
             "s33d": SEED,
@@ -33,6 +32,7 @@ class CreateHost:
     RETURN_TYPES, FUNCTION, CATEGORY = HOST, "create_host", ROOT_CATEGORY_GENERAL
     def create_host(self, **kwargs):
         kwargs.pop("s33d")
+        kwargs["cuda_visible_devices"] = kwargs["cuda_visible_devices"].replace(" ", "")
         global hm
         host = hm.launch_host(kwargs)
         return (host,)

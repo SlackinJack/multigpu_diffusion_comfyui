@@ -112,24 +112,6 @@ class HostManager:
                         closed = True
                         break
 
-        # TODO: implement later, currently consistently slower than torchrun
-        # has_accelerate = False
-        # try:
-        #     import accelerate
-        #     has_accelerate = True
-        # except: pass
-
-        match backend:
-            case "asyncdiff":
-                # if has_accelerate == True:  cmd = ["accelerate", "launch",  f'--main_process_port={config["master_port"]}', f'--num_processes={config["nproc_per_node"]}']
-                # else:                       cmd = ["torchrun",              f'--master-port={config["master_port"]}',       f'--nproc_per_node={config["nproc_per_node"]}']
-                cmd = ["torchrun", f'--master-port={config["master_port"]}', f'--nproc_per_node={config["nproc_per_node"]}']
-                cmd += [f'{get_node_dir()}/multigpu_diffusion/host_{backend}.py', f'--port={port}']
-            case "balanced":
-                cmd = ["python3", f'{get_node_dir()}/multigpu_diffusion/host_{backend}.py', f'--port={port}']
-            case _:
-                raise NotImplementedError
-
         os.environ["OMP_NUM_THREADS"] = "1"
         if len(config["cuda_visible_devices"]) > 0:
             os.environ["CUDA_VISIBLE_DEVICES"] = config["cuda_visible_devices"]
@@ -143,6 +125,27 @@ class HostManager:
         os.environ["DIFFUSERS_VERBOSITY"] = "critical"
         os.environ["DIFFUSERS_NO_ADVISORY_WARNINGS"] = "1"
         os.environ["PYTHONWARNINGS"] = "ignore"
+
+        # TODO: implement later, currently consistently slower than torchrun
+        # has_accelerate = False
+        # try:
+        #     import accelerate
+        #     has_accelerate = True
+        # except: pass
+
+        match backend:
+            case "asyncdiff":
+                # if has_accelerate == True:  cmd = ["accelerate", "launch",  f'--main_process_port={config["master_port"]}', f'--num_processes={config["nproc_per_node"]}']
+                # else:                       cmd = ["torchrun",              f'--master-port={config["master_port"]}',       f'--nproc_per_node={config["nproc_per_node"]}']
+                cmd = ["torchrun", f'--master-port={config["master_port"]}']
+                if len(config["cuda_visible_devices"]) > 0:
+                    cmd += [f'--nproc_per_node={len(config["cuda_visible_devices"].split(","))}']
+                else:
+                    cmd += [f'--nproc_per_node={torch.cuda.device_count()}']
+            case _:
+                cmd = ["python3"]
+                # raise NotImplementedError
+        cmd += [f'{get_node_dir()}/multigpu_diffusion/host_{backend}.py', f'--port={port}']
 
         cmd_string = ""
         for c in cmd: cmd_string += "\n        " + str(c)
