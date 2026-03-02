@@ -2,6 +2,9 @@ import json
 import torch
 
 
+from comfy.utils import ProgressBar
+
+
 from .data_types import *
 from .nodes_host import get_current_manager
 from ..multigpu_diffusion.modules.utils import *
@@ -161,7 +164,9 @@ class SDSampler:
             data["control_image"] = convert_tensor_to_b64(control_image)
             if controlnet_scale is not None: data["controlnet_scale"] = controlnet_scale
 
-        response = get_current_manager().get_result(host, data)
+        pbar = ProgressBar(100)
+        pbar.update_absolute(0)
+        response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         image_out, latent_out = response
         print(IMAGE_SUCCESS_MESSAGE)
@@ -244,7 +249,9 @@ class SDSamplerPrompt:
             data["control_image"] = convert_tensor_to_b64(control_image)
             if controlnet_scale is not None: data["controlnet_scale"] = controlnet_scale
 
-        response = get_current_manager().get_result(host, data)
+        pbar = ProgressBar(100)
+        pbar.update_absolute(0)
+        response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         image_out, latent_out = response
         print(IMAGE_SUCCESS_MESSAGE)
@@ -299,7 +306,10 @@ class SVDSampler:
             "motion_bucket_id":     motion_bucket_id,
             "noise_aug_strength":   noise_aug_strength,
         }
-        response = get_current_manager().get_result(host, data)
+
+        pbar = ProgressBar(100)
+        pbar.update_absolute(0)
+        response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         images = decode_b64_and_unpickle(response)
         tensors = []
@@ -359,7 +369,9 @@ class SDUpscaleSampler:
             if negative_prompt is not None: data["negative"] = negative_prompt
 
             try:
-                response = get_current_manager().get_result(host, data)
+                pbar = ProgressBar(100)
+                pbar.update_absolute(0)
+                response = get_current_manager().get_result(host, data, pbar=pbar)
                 if response is not None:
                     print(f"✅ Finished upscaling image: {i}/{len(images)}")
                     im2 = decode_b64_and_unpickle(response)
@@ -440,7 +452,9 @@ class FluxSampler:
         #     data["control_image"] = convert_tensor_to_b64(control_image)
         #     if controlnet_scale is not None: data["controlnet_scale"] = controlnet_scale
 
-        response = get_current_manager().get_result(host, data)
+        pbar = ProgressBar(100)
+        pbar.update_absolute(0)
+        response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         image_out, latent_out = response
         print(IMAGE_SUCCESS_MESSAGE)
@@ -504,7 +518,9 @@ class WanSampler:
             image = image.squeeze(0)              # NHWC -> HWC
             data["image"] = convert_tensor_to_b64(image)
 
-        response = get_current_manager().get_result(host, data)
+        pbar = ProgressBar(100)
+        pbar.update_absolute(0)
+        response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         images = decode_b64_and_unpickle(response)
         tensors = []
@@ -580,7 +596,9 @@ class ZImageSampler:
             if controlnet_scale is not None: data["controlnet_scale"] = controlnet_scale
         """
 
-        response = get_current_manager().get_result(host, data)
+        pbar = ProgressBar(100)
+        pbar.update_absolute(0)
+        response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         image_out, latent_out = response
         print(IMAGE_SUCCESS_MESSAGE)

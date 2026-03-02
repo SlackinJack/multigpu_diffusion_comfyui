@@ -52,35 +52,71 @@ class HostManager:
         return
 
 
-    def get_from_address(self, address, endpoint, allow_error=False):
+    def get_from_address(self, address, endpoint, allow_error=False, pbar=None):
         if not LOCAL_HOST in address: address = LOCAL_HOST + address
-        result = None
-        try:
-            result = requests.get(f"{address}/{endpoint}")
-        except:
-            if allow_error == False:
-                print(traceback.format_exc())
-                self.close_host_process(address, "Server did not respond")
-            else:
-                pass
-        return result
+        if endpoint not in ["initialize", "progress"]:
+            print(f"ℹ️ Sending GET request to: {address}/{endpoint}")
+
+        results = [None]
+        def get():
+            nonlocal self, address, endpoint, allow_error, results
+            try:
+                results[0] = requests.get(f"{address}/{endpoint}")
+            except:
+                if allow_error == False:
+                    print(traceback.format_exc())
+                    self.close_host_process(address, "Server did not respond")
+            return
+
+        # result = requests.get(f"{address}/{endpoint}")
+        thread = threading.Thread(target=get,)
+        thread.start()
+        if pbar is not None:
+            while thread.is_alive():
+                try:
+                    response = requests.get(f"{address}/progress")
+                    if response.status_code == 200:
+                        pbar.update_absolute(int(response.text))
+                except:
+                    pass
+                time.sleep(1)
+        thread.join()
+        return results[0]
 
 
-    def post_to_address(self, address, endpoint, data):
+    def post_to_address(self, address, endpoint, data, pbar=None):
         if not LOCAL_HOST in address: address = LOCAL_HOST + address
         match endpoint:
             case "apply":   self.__update_config_pipeline(address, data)
             case _:         pass
+        print(f"ℹ️ Sending POST request to: {address}/{endpoint}")
 
-        result = None
-        try:                result = requests.post(f"{address}/{endpoint}", json=data)
-        except:             self.close_host_process(address, "Server did not respond", with_assert="Server did not respond.\nCheck console for details.")
+        results = [None]
+        def post():
+            nonlocal self, address, endpoint, data, results
+            try:
+                results[0] = requests.post(f"{address}/{endpoint}", json=data)
+            except:
+                self.close_host_process(address, "Server did not respond", with_assert="Server did not respond.\nCheck console for details.")
+                return None
 
-        return result
+        # result = requests.post(f"{address}/{endpoint}", json=data)
+        thread = threading.Thread(target=post,)
+        thread.start()
+        if pbar is not None:
+            while thread.is_alive():
+                try:
+                    response = requests.get(f"{address}/progress")
+                    if response.status_code == 200:
+                        pbar.update_absolute(int(response.text))
+                except:
+                    pass
+                time.sleep(1)
+        thread.join()
+        return results[0]
 
 
-    def launch_host(self, config):
-
+    def launch_host(self, config, pbar=None):
         port = str(config.get("port"))
         backend = config.get("backend")
         current_config = self.configs.get(str(port))
@@ -161,6 +197,7 @@ class HostManager:
         self.__set_config_for_address(port, new_config)
 
         current = 0
+        timeout = 30
         while True:
             try:
                 response = self.get_from_address(LOCAL_HOST + port, "initialize", allow_error=True)
@@ -169,8 +206,10 @@ class HostManager:
             except requests.exceptions.RequestException:
                 pass
             time.sleep(1)
+            if pbar is not None:
+                pbar.update_absolute(int(current/timeout))
             current += 1
-            if current >= 30:
+            if current >= timeout:
                 self.close_host_process(port, "Timed out", with_assert="Failed to launch host within 30 seconds.\nCheck console for details.")
 
         return f"{LOCAL_HOST}{port}"
@@ -211,6 +250,8 @@ class HostManager:
                     except Exception as ex:
                         print(f'❌ Error occurred - waiting for host {port} exit\n{str(ex)}')
                         time.sleep(3)
+
+            result = subprocess.run(["curl", f'{LOCAL_HOST}{port}/close'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if not wait_for_close:      threading.Thread(target=close, args=(port, process,)).start()
             else:                       close(port, process)
 
@@ -218,7 +259,7 @@ class HostManager:
         return
 
 
-    def get_result(self, address, data):
+    def get_result(self, address, data, pbar=None):
         port = address.replace(LOCAL_HOST, "")
         config = self.__get_config_by_address(address)
         if config is None: self.close_host_process(port, "Host not active", with_assert="Host not active.\nCheck console for details.")
@@ -226,7 +267,7 @@ class HostManager:
         last_config = config["last_config"]
 
         try:
-            response = self.post_to_address(address, "generate", data)
+            response = self.post_to_address(address, "generate", data, pbar=pbar)
         except requests.exceptions.ConnectionError as e0:
             self.close_host_process(port, "Connection error", with_assert="Connection error.\nCheck console for details.")
         except Exception as e1:

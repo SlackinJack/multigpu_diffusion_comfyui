@@ -34,7 +34,9 @@ class CreateHost:
         kwargs.pop("s33d")
         kwargs["cuda_visible_devices"] = kwargs["cuda_visible_devices"].replace(" ", "")
         global hm
-        host = hm.launch_host(kwargs)
+        pbar = ProgressBar(100)
+        pbar.update_absolute(0)
+        host = hm.launch_host(kwargs, pbar=pbar)
         return (host,)
 
 
@@ -103,7 +105,9 @@ class ApplyPipeline:
                     data[k] = { "model": os.path.join(get_models_dir(), v["model"]), "config": os.path.join(get_models_dir(), v["config"]) }
                     continue
 
-        response = hm.post_to_address(host, "apply", data)
+        pbar = ProgressBar(100)
+        pbar.update_absolute(0)
+        response = hm.post_to_address(host, "apply", data, pbar=pbar)
         if response is None or response.status_code != 200:
             hm.close_host_process(host, "Failed to initialize pipeline", with_assert="Failed to initialize pipeline.\n\nCheck console for details.")
         return (host,)
@@ -119,6 +123,8 @@ class OffloadPipeline:
     def offload_pipeline(self, host, image=None, latent=None):
         global hm
         assert not (image is None and latent is None), "An output needs to be chained to this node in order for this node to work"
-        response = hm.get_from_address(host, "offload")
+        pbar = ProgressBar(100)
+        pbar.update_absolute(0)
+        response = hm.get_from_address(host, "offload", pbar=pbar)
         # TODO: maybe do something with response
         return (host, image, latent,)
