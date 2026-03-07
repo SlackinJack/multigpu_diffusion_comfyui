@@ -1,5 +1,6 @@
 import errno
 import json
+import logging
 import os
 import psutil
 import requests
@@ -29,7 +30,22 @@ class HostManager:
         #        "pipeline": pipeline,
         #    }
         #}
+        logger = logging.getLogger(name="manager")
+        logger.setLevel(logging.INFO)
+        if logger.hasHandlers():
+            logger.handlers.clear()
+        handler = logging.StreamHandler()
+        handler.setLevel(logging.INFO)
+        formatter = logging.Formatter(fmt=f'[ Mngr ]: %(message)s')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.propagate = False
+        self.logger = logger
         return
+
+
+    def log(self, text):
+        self.logger.info(text)
 
 
     def __get_config_by_address(self, address):
@@ -55,7 +71,7 @@ class HostManager:
     def get_from_address(self, address, endpoint, allow_error=False, pbar=None):
         if not LOCAL_HOST in address: address = LOCAL_HOST + address
         if endpoint not in ["initialize", "progress"]:
-            print(f"ℹ️ Sending GET request to: {address}/{endpoint}")
+            self.log(f"ℹ️ Sending GET request to: {address}/{endpoint}")
 
         results = [None]
         def get():
@@ -64,7 +80,7 @@ class HostManager:
                 results[0] = requests.get(f"{address}/{endpoint}")
             except:
                 if allow_error == False:
-                    print(traceback.format_exc())
+                    self.log(f"{traceback.format_exc()}")
                     self.close_host_process(address, "Server did not respond")
             return
 
@@ -89,7 +105,7 @@ class HostManager:
         match endpoint:
             case "apply":   self.__update_config_pipeline(address, data)
             case _:         pass
-        print(f"ℹ️ Sending POST request to: {address}/{endpoint}")
+        self.log(f"ℹ️ Sending POST request to: {address}/{endpoint}")
 
         results = [None]
         def post():
@@ -185,7 +201,7 @@ class HostManager:
 
         cmd_string = ""
         for c in cmd: cmd_string += "\n        " + str(c)
-        print(f'🟢 Starting host: {cmd_string}')
+        self.log(f'🟢 Starting host: {cmd_string}')
 
         process = subprocess.Popen(cmd)
         new_config = {
@@ -222,11 +238,11 @@ class HostManager:
 
         config = self.configs.get(port)
         if config is None:
-            print(f'❓ No host config - assuming host {port} is already closed')
+            self.log(f'❓ No host config - assuming host {port} is already closed')
         else:
             process = config.get("process")
-            if wait_for_close:  print(f'🟡 Synchronously stopping host {port} process - {reason}')
-            else:               print(f'🟡 Stopping host {port} process - {reason}')
+            if wait_for_close:  self.log(f'🟡 Synchronously stopping host {port} process - {reason}')
+            else:               self.log(f'🟡 Stopping host {port} process - {reason}')
             def close(port, process):
                 host = psutil.Process(process.pid)
                 workers = [host] + host.children(recursive=True)
@@ -241,14 +257,14 @@ class HostManager:
                         s.close()
                         if self.configs.get(port) is not None:
                             del self.configs[port]
-                        print(f'🛑 Host {port} has been stopped')
+                        self.log(f'🛑 Host {port} has been stopped')
                         break
                     except socket.error as e:
                         if e.errno == errno.EADDRINUSE:
-                            print(f'⏳ Host {port} still active - waiting for exit')
+                            self.log(f'⏳ Host {port} still active - waiting for exit')
                             time.sleep(3)
                     except Exception as ex:
-                        print(f'❌ Error occurred - waiting for host {port} exit\n{str(ex)}')
+                        self.log(f'❌ Error occurred - waiting for host {port} exit\n{str(ex)}')
                         time.sleep(3)
 
             result = subprocess.run(["curl", f'{LOCAL_HOST}{port}/close'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)

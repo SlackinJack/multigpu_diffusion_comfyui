@@ -86,7 +86,7 @@ class ADSampler:
         tensors = []
         for i in images:
             tensors.append(convert_image_to_hwc_tensor(i))
-        print(MULTI_SUCCESS_MESSAGE)
+        get_current_manager().log(MULTI_SUCCESS_MESSAGE)
         return (host, torch.stack(tuple(tensors)),)   # HWC -> NHWC
 """
 
@@ -169,7 +169,7 @@ class SDSampler:
         response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         image_out, latent_out = response
-        print(IMAGE_SUCCESS_MESSAGE)
+        get_current_manager().log(IMAGE_SUCCESS_MESSAGE)
         return (host, convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
 
 
@@ -254,7 +254,7 @@ class SDSamplerPrompt:
         response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         image_out, latent_out = response
-        print(IMAGE_SUCCESS_MESSAGE)
+        get_current_manager().log(IMAGE_SUCCESS_MESSAGE)
         return (host, convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
 
 
@@ -315,7 +315,7 @@ class SVDSampler:
         tensors = []
         for i in images:
             tensors.append(convert_image_to_hwc_tensor(i))
-        print(MULTI_SUCCESS_MESSAGE)
+        get_current_manager().log(MULTI_SUCCESS_MESSAGE)
         return (host, torch.stack(tuple(tensors)),)   # HWC -> NHWC
 
 
@@ -356,7 +356,7 @@ class SDUpscaleSampler:
         i = 0
         for im in images:
             i += 1
-            print(f"⏳ Upscaling image: {i}/{len(images)}")
+            get_current_manager().log(f"⏳ Upscaling image: {i}/{len(images)}")
             b64_image = convert_tensor_to_b64(im)
             data = {
                 "image": b64_image,
@@ -373,18 +373,18 @@ class SDUpscaleSampler:
                 pbar.update_absolute(0)
                 response = get_current_manager().get_result(host, data, pbar=pbar)
                 if response is not None:
-                    print(f"✅ Finished upscaling image: {i}/{len(images)}")
+                    get_current_manager().log(f"✅ Finished upscaling image: {i}/{len(images)}")
                     im2 = decode_b64_and_unpickle(response)
                     tensors.append(convert_image_to_hwc_tensor(im2))
                 else:
                     if len(images) == 1:
-                        print("❌ No media generated")
+                        get_current_manager().log("❌ No media generated")
                     else:
-                        print(f"❌ Error processing image: {i}/{len(images)}")
+                        get_current_manager().log(f"❌ Error processing image: {i}/{len(images)}")
             except Exception as e:
-                print("❌ Error getting data from server.\n" + str(e))
+                get_current_manager().log("❌ Error getting data from server.\n" + str(e))
         assert len(tensors) > 0, "No media generated.\nCheck console for details."
-        print(IMAGE_SUCCESS_MESSAGE)
+        get_current_manager().log(IMAGE_SUCCESS_MESSAGE)
         return (host, torch.stack(tuple(tensors)),)       # HWC -> NHWC
 
 
@@ -457,7 +457,7 @@ class FluxSampler:
         response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         image_out, latent_out = response
-        print(IMAGE_SUCCESS_MESSAGE)
+        get_current_manager().log(IMAGE_SUCCESS_MESSAGE)
         return (host, convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
 
 
@@ -526,7 +526,7 @@ class WanSampler:
         tensors = []
         for i in images:
             tensors.append(convert_image_to_hwc_tensor(i))
-        print(MULTI_SUCCESS_MESSAGE)
+        get_current_manager().log(MULTI_SUCCESS_MESSAGE)
         return (host, torch.stack(tuple(tensors)),)   # HWC -> NHWC
 
 
@@ -601,5 +601,5 @@ class ZImageSampler:
         response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         image_out, latent_out = response
-        print(IMAGE_SUCCESS_MESSAGE)
+        get_current_manager().log(IMAGE_SUCCESS_MESSAGE)
         return (host, convert_b64_to_nhwc_tensor(image_out), { "samples": decode_b64_and_unpickle(latent_out) },)
