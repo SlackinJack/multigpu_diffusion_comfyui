@@ -37,6 +37,7 @@ NODE_CLASS_MAPPINGS = {
     "CreateHost": CreateHost,
     "CloseHost": CloseHost,
     "ApplyPipeline": ApplyPipeline,
+    "SleepHost": SleepHost,
     "OffloadPipeline": OffloadPipeline,
 
     # "ADSampler": ADSampler,
@@ -78,6 +79,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "CreateHost": "CreateHost",
     "CloseHost": "CloseHost",
     "ApplyPipeline": "ApplyPipeline",
+    "SleepHost": "SleepHost",
     "OffloadPipeline": "OffloadPipeline",
 
     # "ADSampler": "ADSampler",

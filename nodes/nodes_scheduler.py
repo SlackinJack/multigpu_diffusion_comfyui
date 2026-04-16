@@ -47,14 +47,14 @@ class FMEulerScheduler:
     @classmethod
     def INPUT_TYPES(s): return {
         "required": {
-            "shift":                    ("FLOAT", { "default": 1.00000, "min": 0.00000, "step": 0.00001 }),
+            "shift":                    ("FLOAT", { "default": 1.00000, "min": 0.00001, "step": 0.00001 }),
             "use_dynamic_shifting":     TRILEAN_WITH_DEFAULT,
             "base_shift":               ("FLOAT", { "default": 0.50000, "min": 0.00000, "step": 0.00001 }),
             "max_shift":                ("FLOAT", { "default": 1.15000, "min": 0.00000, "step": 0.00001 }),
             "base_image_seq_len":       ("INT", { "default": 256, "min": INT_MIN, "max": INT_MAX }),
             "max_image_seq_len":        ("INT", { "default": 4096, "min": INT_MIN, "max": INT_MAX }),
             "invert_sigmas":            TRILEAN_WITH_DEFAULT,
-            "shift_terminal":           ("FLOAT", { "default": 0.00000, "min": 0.00000, "step": 0.00001 }),
+            "shift_terminal":           ("FLOAT", { "default": 0.00000, "min": 0.00000, "max": INT_MAX, "step": 0.00001 }),
             "use_karras_sigmas":        TRILEAN_WITH_DEFAULT,
             "use_exponential_sigmas":   TRILEAN_WITH_DEFAULT,
             "use_beta_sigmas":          TRILEAN_WITH_DEFAULT,

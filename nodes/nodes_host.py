@@ -43,15 +43,17 @@ class CreateHost:
 class CloseHost:
     @classmethod
     def INPUT_TYPES(s): return {
-        "required": { "host": HOST, "wait_for_close": BOOLEAN_DEFAULT_TRUE },
-        "optional": { "image": IMAGE, "latent": LATENT }
+        "required": {
+            "host": HOST,
+            "wait_for_close": BOOLEAN_DEFAULT_TRUE,
+            "obj": ("*",),
+        }
     }
-    RETURN_TYPES, FUNCTION, CATEGORY = ("IMAGE", "LATENT",), "destroy_host", ROOT_CATEGORY_GENERAL
-    def destroy_host(self, host, wait_for_close, image=None, latent=None):
+    RETURN_TYPES, FUNCTION, CATEGORY = ("*",), "destroy_host", ROOT_CATEGORY_GENERAL
+    def destroy_host(self, host, wait_for_close, obj):
         global hm
-        assert not (image is None and latent is None), "An output needs to be chained to this node in order for this node to work"
         hm.close_host_process(host, "Closed by node", wait_for_close=wait_for_close)
-        return (image, latent,)
+        return (obj,)
 
 
 class ApplyPipeline:
@@ -113,18 +115,40 @@ class ApplyPipeline:
         return (host,)
 
 
+class SleepHost:
+    @classmethod
+    def INPUT_TYPES(s): return {
+        "required": {
+            "host": HOST,
+            "time": ("INT", { "min": 0, "max": INT_MAX, "step": 1 }),
+            "obj": ("*",),
+        }
+    }
+    RETURN_TYPES, FUNCTION, CATEGORY = ("MD_HOST", "*",), "sleep_host", ROOT_CATEGORY_CONFIG
+    def sleep_host(self, host, time, obj):
+        global hm
+        pbar = ProgressBar(100)
+        pbar.update_absolute(0)
+        data = {"sleep": True, "time": time}
+        response = hm.post_to_address(host, "sleep", data, pbar=pbar)
+        # TODO: maybe do something with response
+        return (host, obj,)
+
+
 class OffloadPipeline:
     @classmethod
     def INPUT_TYPES(s): return {
-        "required": { "host": HOST },
-        "optional": { "image": IMAGE, "latent": LATENT },
+        "required": {
+            "host": HOST,
+            "wait_for_offload": BOOLEAN_DEFAULT_TRUE,
+            "obj": ("*",),
+        }
     }
-    RETURN_TYPES, FUNCTION, CATEGORY = ("MD_HOST", "IMAGE", "LATENT",), "offload_pipeline", ROOT_CATEGORY_CONFIG
-    def offload_pipeline(self, host, image=None, latent=None):
+    RETURN_TYPES, FUNCTION, CATEGORY = ("MD_HOST", "*",), "offload_pipeline", ROOT_CATEGORY_CONFIG
+    def offload_pipeline(self, host, wait_for_offload, obj):
         global hm
-        assert not (image is None and latent is None), "An output needs to be chained to this node in order for this node to work"
         pbar = ProgressBar(100)
         pbar.update_absolute(0)
-        response = hm.get_from_address(host, "offload", pbar=pbar)
+        response = hm.get_from_address(host, "offload", pbar=pbar, wait=wait_for_offload)
         # TODO: maybe do something with response
-        return (host, image, latent,)
+        return (host, obj,)

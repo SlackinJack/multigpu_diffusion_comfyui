@@ -68,7 +68,17 @@ class HostManager:
         return
 
 
-    def get_from_address(self, address, endpoint, allow_error=False, pbar=None):
+    def __update_pbar(self, address, pbar):
+        try:
+            response = requests.get(f"{address}/progress")
+            if response.status_code == 200:
+                pbar.update_absolute(int(response.text), total=100)
+        except:
+            pass
+        return
+
+
+    def get_from_address(self, address, endpoint, allow_error=False, pbar=None, wait=True):
         if not LOCAL_HOST in address: address = LOCAL_HOST + address
         if endpoint not in ["initialize", "progress"]:
             self.log(f"ℹ️ Sending GET request to: {address}/{endpoint}")
@@ -87,16 +97,16 @@ class HostManager:
         # result = requests.get(f"{address}/{endpoint}")
         thread = threading.Thread(target=get,)
         thread.start()
-        if pbar is not None:
-            while thread.is_alive():
-                try:
-                    response = requests.get(f"{address}/progress")
-                    if response.status_code == 200:
-                        pbar.update_absolute(int(response.text))
-                except:
-                    pass
-                time.sleep(1)
-        thread.join()
+        if wait == True:
+            if pbar is not None:
+                while thread.is_alive():
+                    self.__update_pbar(address, pbar)
+                    time.sleep(1)
+            thread.join()
+        else:
+            if pbar is not None:
+                pbar.update_absolute(100)
+        time.sleep(1)
         return results[0]
 
 
@@ -121,12 +131,7 @@ class HostManager:
         thread.start()
         if pbar is not None:
             while thread.is_alive():
-                try:
-                    response = requests.get(f"{address}/progress")
-                    if response.status_code == 200:
-                        pbar.update_absolute(int(response.text))
-                except:
-                    pass
+                self.__update_pbar(address, pbar)
                 time.sleep(1)
         thread.join()
         return results[0]
@@ -223,7 +228,7 @@ class HostManager:
                 pass
             time.sleep(1)
             if pbar is not None:
-                pbar.update_absolute(int(current/timeout))
+                pbar.update_absolute(int(current/timeout*100), total=100)
             current += 1
             if current >= timeout:
                 self.close_host_process(port, "Timed out", with_assert="Failed to launch host within 30 seconds.\nCheck console for details.")
@@ -290,8 +295,8 @@ class HostManager:
             self.close_host_process(port, "Exception occurred while connecting", with_assert="Exception occurred while connecting.\nCheck console for details.")
 
         try:
+            assert response is not None and response.json() is not None, "No response from host.\nCheck console for details."
             response_data = response.json()
-            assert response_data is not None, "No response from host.\nCheck console for details."
             output_image_b64 = response_data.get("output")
             output_latent_b64 = response_data.get("latent")
             assert output_image_b64 is not None or output_latent_b64 is not None, response_data.get("message")
