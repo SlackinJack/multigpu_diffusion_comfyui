@@ -13,7 +13,8 @@ NODE_CLASS_MAPPINGS = {
     "CheckpointSelector": CheckpointSelector,
     "SchedulerSelector": SchedulerSelector,
     "AdvancedSchedulerSelector": AdvancedSchedulerSelector,
-    "FMEulerScheduler": FMEulerScheduler,
+    "FlowMatchScheduler": FlowMatchScheduler,
+    "AdvancedFlowMatchScheduler": AdvancedFlowMatchScheduler,
     "ModelSelector": ModelSelector,
     "UnsafeModelSelector": UnsafeModelSelector,
     "LoraSelector": LoraSelector,
@@ -46,7 +47,6 @@ NODE_CLASS_MAPPINGS = {
     "SDSamplerPrompt": SDSamplerPrompt,
     "SDUpscaleSampler": SDUpscaleSampler,
     "SVDSampler": SVDSampler,
-    "WanSampler": WanSampler,
     "ZImageSampler": ZImageSampler,
 }
 
@@ -55,7 +55,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "CheckpointSelector": "CheckpointSelector",
     "SchedulerSelector": "SchedulerSelector",
     "AdvancedSchedulerSelector": "AdvancedSchedulerSelector",
-    "FMEulerScheduler": "FMEulerScheduler",
+    "FlowMatchScheduler": "FlowMatchScheduler",
+    "AdvancedFlowMatchScheduler": "AdvancedFlowMatchScheduler",
     "ModelSelector": "ModelSelector",
     "UnsafeModelSelector": "UnsafeModelSelector",
     "LoraSelector": "LoraSelector",
@@ -88,7 +89,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SDSamplerPrompt": "SDSampler (Using Prompt)",
     "SDUpscaleSampler": "SDUpscaleSampler",
     "SVDSampler": "SVDSampler",
-    "WanSampler": "WanSampler",
     "ZImageSampler": "ZImageSampler",
 }
 

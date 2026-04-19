@@ -36,7 +36,7 @@ class HostManager:
             logger.handlers.clear()
         handler = logging.StreamHandler()
         handler.setLevel(logging.INFO)
-        formatter = logging.Formatter(fmt=f'[ Mngr ]: %(message)s')
+        formatter = logging.Formatter(fmt=f'[ Node ]: %(message)s')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         logger.propagate = False

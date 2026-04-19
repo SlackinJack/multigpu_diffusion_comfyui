@@ -28,7 +28,7 @@ LATENT = ("LATENT",)
 
 VARIANT = (["bf16", "fp16", "fp32"], { "default": "fp16" })
 COMPEL_MODEL_LIST = (["sd1", "sd2", "sdxl"], { "default": "sdxl" })
-SUPPORTED_MODEL_LIST = (["chroma", "flux", "sd1", "sd2", "sd3", "sdup", "sdxl", "svd", "want2v", "wani2v", "zimage"], { "default": "sdxl" }) # "ad"
+SUPPORTED_MODEL_LIST = (["chroma", "flux", "sd1", "sd2", "sd3", "sdup", "sdxl", "svd", "zimage"], { "default": "sdxl" }) # "ad"
 
 
 CHECKPOINT = ("MD_CHECKPOINT",)

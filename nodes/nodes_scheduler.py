@@ -43,10 +43,24 @@ class AdvancedSchedulerSelector:
         return (scheduler_config,)
 
 
-class FMEulerScheduler:
+class FlowMatchScheduler:
     @classmethod
     def INPUT_TYPES(s): return {
         "required": {
+            "scheduler":                (["fm_euler", "fm_heun"], {"default": "fm_euler"}),
+        }
+    }
+    RETURN_TYPES, FUNCTION, CATEGORY = FM_SCHEDULER, "get", ROOT_CATEGORY_GENERAL
+    def get(self, scheduler):
+        scheduler_config = { "scheduler": scheduler }
+        return (scheduler_config,)
+
+
+class AdvancedFlowMatchScheduler:
+    @classmethod
+    def INPUT_TYPES(s): return {
+        "required": {
+            "scheduler":                (["fm_euler", "fm_heun"], { "default": "fm_euler" }),
             "shift":                    ("FLOAT", { "default": 1.00000, "min": 0.00001, "step": 0.00001 }),
             "use_dynamic_shifting":     TRILEAN_WITH_DEFAULT,
             "base_shift":               ("FLOAT", { "default": 0.50000, "min": 0.00000, "step": 0.00001 }),
@@ -64,7 +78,7 @@ class FMEulerScheduler:
     }
     RETURN_TYPES, FUNCTION, CATEGORY = FM_SCHEDULER, "get", ROOT_CATEGORY_GENERAL
     def get(self, **kwargs):
-        scheduler_config = {"scheduler": "fm_euler"}
+        scheduler_config = { "scheduler": kwargs.pop("scheduler") }
         for k, v in kwargs.items():
             if k in ["shift", "base_shift", "max_shift", "base_image_seq_len", "max_image_seq_len", "shift_terminal", "time_shift_type"]:
                 scheduler_config[k] = v
