@@ -254,27 +254,28 @@ class HostManager:
                 while True:
                     for w in workers:
                         result = subprocess.run(["kill", "-9", str(w.pid)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    try:
-                        time.sleep(3)
-                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        s.bind(("localhost", int(port)))
-                        time.sleep(1)
-                        s.close()
-                        if self.configs.get(port) is not None:
-                            del self.configs[port]
-                        self.log(f'🛑 Host {port} has been stopped')
-                        break
-                    except socket.error as e:
-                        if e.errno == errno.EADDRINUSE:
-                            self.log(f'⏳ Host {port} still active - waiting for exit')
-                            time.sleep(3)
-                    except Exception as ex:
-                        self.log(f'❌ Error occurred - waiting for host {port} exit\n{str(ex)}')
-                        time.sleep(3)
+                    # try:
+                    # time.sleep(3)
+                    # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    # s.bind(("localhost", int(port)))
+                    # time.sleep(1)
+                    # s.close()
+                    if self.configs.get(port) is not None:
+                        del self.configs[port]
+                    self.log(f'🛑 Host {port} has been stopped')
+                    break
+                    # except socket.error as e:
+                    #     if e.errno == errno.EADDRINUSE:
+                    #         self.log(f'⏳ Host {port} still active - waiting for exit')
+                    #         time.sleep(3)
+                    # except Exception as ex:
+                    #     self.log(f'❌ Error occurred - waiting for host {port} exit\n{str(ex)}')
+                    #     time.sleep(3)
 
             result = subprocess.run(["curl", f'{LOCAL_HOST}{port}/close'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            if not wait_for_close:      threading.Thread(target=close, args=(port, process,)).start()
-            else:                       close(port, process)
+            # if not wait_for_close:      threading.Thread(target=close, args=(port, process,)).start()
+            # else:                       close(port, process)
+            threading.Thread(target=close, args=(port, process,)).start()
 
         assert with_assert is None, with_assert
         return

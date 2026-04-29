@@ -1,6 +1,7 @@
 # multigpu_diffusion_comfyui
 
 ComfyUI nodes to run [multigpu_diffusion](https://github.com/SlackinJack/multigpu_diffusion).
+(Basically, a ComfyUI front-end to Diffusers, with support for multi-GPU environments.)
 
 
 ## Notes:
@@ -10,5 +11,6 @@ ComfyUI nodes to run [multigpu_diffusion](https://github.com/SlackinJack/multigp
 
 ## Test Environment:
 - ComfyUI 0.9.1
-- 2x Intel Xeon E5-2696v4
 - 4x Nvidia Tesla T4
+- Ubuntu Server 26.04
+- Python 3.14.4

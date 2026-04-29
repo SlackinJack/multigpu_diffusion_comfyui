@@ -63,14 +63,15 @@ class ApplyPipeline:
             "required": {
                 "host": HOST,
                 "backend_config": BACKEND_CONFIG,
-                "checkpoint": MODEL,
                 "pipeline_type": SUPPORTED_MODEL_LIST,
                 "variant": VARIANT,
+                "checkpoint": MODEL,
                 "vae_fp16": BOOLEAN_DEFAULT_FALSE,
                 "enable_vae_tiling": BOOLEAN_DEFAULT_FALSE,
                 "enable_vae_slicing": BOOLEAN_DEFAULT_FALSE,
                 "enable_attention_slicing": BOOLEAN_DEFAULT_FALSE,
                 "xformers_efficient": BOOLEAN_DEFAULT_FALSE,
+                "sd_fuse_qkv_projections": BOOLEAN_DEFAULT_FALSE,
             },
             "optional": {
                 "lora": LORA,
@@ -88,6 +89,7 @@ class ApplyPipeline:
                 "quantization_config": QUANT_CONFIG,
                 "torch_config": TORCH_CONFIG,
                 "group_offload_config": GROUP_OFFLOAD_CONFIG,
+                "attn_backend_config": ATTN_BACKEND_CONFIG,
             },
         }
     RETURN_TYPES, FUNCTION, CATEGORY = HOST, "apply_pipeline", ROOT_CATEGORY_CONFIG

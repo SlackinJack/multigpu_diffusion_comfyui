@@ -34,6 +34,7 @@ NODE_CLASS_MAPPINGS = {
     "QuantizationConfig": QuantizationConfig,
     "GroupOffloadConfig": GroupOffloadConfig,
     "OffloadConfig": OffloadConfig,
+    "AttentionBackendConfig": AttentionBackendConfig,
 
     "CreateHost": CreateHost,
     "CloseHost": CloseHost,
@@ -47,6 +48,7 @@ NODE_CLASS_MAPPINGS = {
     "SDSamplerPrompt": SDSamplerPrompt,
     "SDUpscaleSampler": SDUpscaleSampler,
     "SVDSampler": SVDSampler,
+    "WanSampler": WanSampler,
     "ZImageSampler": ZImageSampler,
 }
 
@@ -76,6 +78,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "QuantizationConfig": "QuantizationConfig",
     "GroupOffloadConfig": "GroupOffloadConfig",
     "OffloadConfig": "OffloadConfig",
+    "AttentionBackendConfig": "AttentionBackendConfig",
 
     "CreateHost": "CreateHost",
     "CloseHost": "CloseHost",
@@ -89,6 +92,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SDSamplerPrompt": "SDSampler (Using Prompt)",
     "SDUpscaleSampler": "SDUpscaleSampler",
     "SVDSampler": "SVDSampler",
+    "WanSampler": "WanSampler",
     "ZImageSampler": "ZImageSampler",
 }
 

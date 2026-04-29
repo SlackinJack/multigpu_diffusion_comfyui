@@ -104,14 +104,15 @@ class CompileConfig:
             "compile_encoder":          BOOLEAN_DEFAULT_FALSE,
             "compile_backend":          (["default", "inductor", "eager"], { "default": "default" }),
             "compile_mode":             (["default", "reduce-overhead", "max-autotune", "max-autotune-no-cudagraphs"], { "default": "default" }),
-            "compile_options":          ("STRING", { "default": "", "multiline": False }),
-            "compile_fullgraph_off":    BOOLEAN_DEFAULT_FALSE,
+            "compile_options":          ("STRING", { "default": "{}", "multiline": True }),
+            "dynamic":                  BOOLEAN_DEFAULT_TRUE,
+            "fullgraph":                BOOLEAN_DEFAULT_TRUE,
         }
     }
 
     RETURN_TYPES, FUNCTION, CATEGORY = COMPILE_CONFIG, "get_config", ROOT_CATEGORY_CONFIG
 
-    def get_config(self, compile_transformer, compile_vae, compile_encoder, compile_backend, compile_mode, compile_options, compile_fullgraph_off):
+    def get_config(self, compile_transformer, compile_vae, compile_encoder, compile_backend, compile_mode, compile_options, dynamic, fullgraph):
         out = {}
         if compile_transformer is True:     out["compile_transformer"] = True
         if compile_vae is True:             out["compile_vae"] = True
@@ -119,5 +120,17 @@ class CompileConfig:
         if compile_backend != "default":    out["compile_backend"] = compile_backend
         if compile_mode != "default":       out["compile_mode"] = compile_mode
         if len(compile_options) > 0:        out["compile_options"] = compile_options
-        if compile_fullgraph_off is True:   out["compile_fullgraph_off"] = True
+        if dynamic is True:                 out["dynamic"] = True
+        if fullgraph is True:               out["fullgraph"] = True
         return (out,)
+
+
+class AttentionBackendConfig:
+    @classmethod
+    def INPUT_TYPES(s): return {
+        "required": {
+            "backend": ATTN_BACKEND_LIST,
+        }
+    }
+    RETURN_TYPES, FUNCTION, CATEGORY = ATTN_BACKEND_CONFIG, "get_config", ROOT_CATEGORY_CONFIG
+    def get_config(self, **kwargs): return (kwargs,)

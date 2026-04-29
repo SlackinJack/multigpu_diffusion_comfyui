@@ -28,7 +28,35 @@ LATENT = ("LATENT",)
 
 VARIANT = (["bf16", "fp16", "fp32"], { "default": "fp16" })
 COMPEL_MODEL_LIST = (["sd1", "sd2", "sdxl"], { "default": "sdxl" })
-SUPPORTED_MODEL_LIST = (["chroma", "flux", "sd1", "sd2", "sd3", "sdup", "sdxl", "svd", "zimage"], { "default": "sdxl" }) # "ad"
+SUPPORTED_MODEL_LIST = (["flux", "sd1", "sd2", "sd3", "sdup", "sdxl", "svd", "want2v", "wani2v", "zimage"], { "default": "sdxl" }) # "ad"
+ATTN_BACKEND_LIST = ([
+    "native",
+    "flex",
+    "_native_cudnn",
+    "_native_efficient",
+    "_native_flash",
+    "_native_math",
+    "_native_npu",
+    "_native_xla",
+    "flash",
+    "flash_hub",
+    "flash_varlen",
+    "flash_varlen_hub",
+    "aiter",
+    "flash_4_hub",
+    "_flash_3",
+    "_flash_varlen_3",
+    "_flash_3_hub",
+    "_flash_3_varlen_hub",
+    "sage",
+    "sage_hub",
+    "sage_varlen",
+    "_sage_qk_int8_pv_fp8_cuda",
+    "_sage_qk_int8_pv_fp8_cuda_sm90",
+    "_sage_qk_int8_pv_fp16_cuda",
+    "_sage_qk_int8_pv_fp16_triton",
+    "xformers"
+], { "default": "native" })
 
 
 CHECKPOINT = ("MD_CHECKPOINT",)
@@ -60,6 +88,7 @@ TORCH_CONFIG            = ("MD_TORCH_CONFIG",)
 GROUP_OFFLOAD_CONFIG    = ("MD_GROUP_OFFLOAD_CONFIG",)
 OFFLOAD_CONFIG          = ("MD_OFFLOAD_CONFIG",)
 COMPILE_CONFIG          = ("MD_COMPILE_CONFIG",)
+ATTN_BACKEND_CONFIG     = ("MD_ATTN_BACKEND_CONFIG",)
 
 
 PROMPT                  = ("STRING", { "default": "", "multiline": True })
