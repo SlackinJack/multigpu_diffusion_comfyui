@@ -9,11 +9,11 @@ from ..multigpu_diffusion.modules.utils import *
 
 
 ASYNCDIFF_CONFIGS = {
-    "model_n":          ("INT", { "default": 2, "min": 1 }),
-    "stride":           ("INT", { "default": 1, "min": 1 }),
-    "time_shift":       ("INT", { "default": 0, "min": 0 }),
-    "synced_steps":     ("INT", { "default": 10, "min": 0 }),
-    "cache_step":       ("INT", { "default": 1, "min": 1 }),
+    "model_n":      ("INT", { "default": 2, "min": 1 }),
+    "stride":       ("INT", { "default": 1, "min": 1 }),
+    "synced_steps": ("INT", { "default": 10, "min": 0 }),
+    "time_shift":   ("INT", { "default": 0, "min": 0 }),
+    "cache_step":   ("INT", { "default": 1, "min": 1 }),
 }
 
 

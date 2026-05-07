@@ -5,8 +5,14 @@ ComfyUI nodes to run [multigpu_diffusion](https://github.com/SlackinJack/multigp
 
 
 ## Notes:
-- Run `setup.sh` before use. 
 - Does not (and will never) use native sampling.
+- Windows and macOS are (probably) not supported.
+
+
+## Usage:
+1. If applicable, activate your ComfyUI venv.
+2. `cd` to `custom_nodes/multigpu_diffusion_comfyui`.
+3. (Review and) run `setup.sh`.
 
 
 ## Test Environment:
