@@ -82,6 +82,7 @@ PIPELINE_INIT_TIMEOUT = ("INT", { "default": 600, "min": 0, "max": INT_MAX, "ste
 
 SCHEDULER               = ("MD_SCHEDULER",)
 FM_SCHEDULER            = ("MD_FM_SCHEDULER",)
+SCHEDULER_CONFIG        = ("MD_SCHEDULER_CONFIG",)
 MODEL_QUANT_CONFIG      = ("MD_MODEL_QUANT_CONFIG",)
 QUANT_CONFIG            = ("MD_QUANT_CONFIG",)
 TORCH_CONFIG            = ("MD_TORCH_CONFIG",)

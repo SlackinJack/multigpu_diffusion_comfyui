@@ -4,7 +4,6 @@ import logging
 import os
 import psutil
 import requests
-import socket
 import subprocess
 import threading
 import time
@@ -94,7 +93,6 @@ class HostManager:
                     self.close_host_process(address, "Server did not respond")
             return
 
-        # result = requests.get(f"{address}/{endpoint}")
         thread = threading.Thread(target=get,)
         thread.start()
         if wait == True:
@@ -126,7 +124,6 @@ class HostManager:
                 self.close_host_process(address, "Server did not respond", with_assert="Server did not respond.\nCheck console for details.")
                 return None
 
-        # result = requests.post(f"{address}/{endpoint}", json=data)
         thread = threading.Thread(target=post,)
         thread.start()
         if pbar is not None:
@@ -236,7 +233,7 @@ class HostManager:
         return f"{LOCAL_HOST}{port}"
 
 
-    def close_host_process(self, port, reason, wait_for_close=True, with_assert=None):
+    def close_host_process(self, port, reason, with_assert=None):
         if LOCAL_HOST in port: port = port.replace(LOCAL_HOST, "")
 
         self.get_from_address(LOCAL_HOST+port, "close", allow_error=True)
@@ -246,37 +243,20 @@ class HostManager:
             self.log(f'❓ No host config - assuming host {port} is already closed')
         else:
             process = config.get("process")
-            if wait_for_close:  self.log(f'🟡 Synchronously stopping host {port} process - {reason}')
-            else:               self.log(f'🟡 Stopping host {port} process - {reason}')
+            self.log(f'🟡 Stopping host {port} process - {reason}')
             def close(port, process):
                 host = psutil.Process(process.pid)
                 workers = [host] + host.children(recursive=True)
                 while True:
                     for w in workers:
                         result = subprocess.run(["kill", "-9", str(w.pid)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    # try:
-                    # time.sleep(3)
-                    # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    # s.bind(("localhost", int(port)))
-                    # time.sleep(1)
-                    # s.close()
                     if self.configs.get(port) is not None:
                         del self.configs[port]
+                    time.sleep(3)
                     self.log(f'🛑 Host {port} has been stopped')
                     break
-                    # except socket.error as e:
-                    #     if e.errno == errno.EADDRINUSE:
-                    #         self.log(f'⏳ Host {port} still active - waiting for exit')
-                    #         time.sleep(3)
-                    # except Exception as ex:
-                    #     self.log(f'❌ Error occurred - waiting for host {port} exit\n{str(ex)}')
-                    #     time.sleep(3)
-
             result = subprocess.run(["curl", f'{LOCAL_HOST}{port}/close'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            # if not wait_for_close:      threading.Thread(target=close, args=(port, process,)).start()
-            # else:                       close(port, process)
             threading.Thread(target=close, args=(port, process,)).start()
-
         assert with_assert is None, with_assert
         return
 

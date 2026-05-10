@@ -45,14 +45,13 @@ class CloseHost:
     def INPUT_TYPES(s): return {
         "required": {
             "host": HOST,
-            "wait_for_close": BOOLEAN_DEFAULT_TRUE,
             "obj": ("*",),
         }
     }
     RETURN_TYPES, FUNCTION, CATEGORY = ("*",), "destroy_host", ROOT_CATEGORY_GENERAL
-    def destroy_host(self, host, wait_for_close, obj):
+    def destroy_host(self, host, obj):
         global hm
-        hm.close_host_process(host, "Closed by node", wait_for_close=wait_for_close)
+        hm.close_host_process(host, "Closed by node")
         return (obj,)
 
 
@@ -142,7 +141,6 @@ class OffloadPipeline:
     def INPUT_TYPES(s): return {
         "required": {
             "host": HOST,
-            "wait_for_offload": BOOLEAN_DEFAULT_TRUE,
             "obj": ("*",),
         }
     }
@@ -151,6 +149,6 @@ class OffloadPipeline:
         global hm
         pbar = ProgressBar(100)
         pbar.update_absolute(0)
-        response = hm.get_from_address(host, "offload", pbar=pbar, wait=wait_for_offload)
+        response = hm.get_from_address(host, "offload", pbar=pbar)
         # TODO: maybe do something with response
         return (host, obj,)

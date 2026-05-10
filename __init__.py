@@ -12,9 +12,9 @@ from .nodes.nodes_single import *
 NODE_CLASS_MAPPINGS = {
     "CheckpointSelector": CheckpointSelector,
     "SchedulerSelector": SchedulerSelector,
-    "AdvancedSchedulerSelector": AdvancedSchedulerSelector,
+    "SchedulerConfig": SchedulerConfig,
     "FlowMatchScheduler": FlowMatchScheduler,
-    "AdvancedFlowMatchScheduler": AdvancedFlowMatchScheduler,
+    "FlowMatchSchedulerConfig": FlowMatchSchedulerConfig,
     "ModelSelector": ModelSelector,
     "UnsafeModelSelector": UnsafeModelSelector,
     "LoraSelector": LoraSelector,
@@ -56,9 +56,9 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "CheckpointSelector": "CheckpointSelector",
     "SchedulerSelector": "SchedulerSelector",
-    "AdvancedSchedulerSelector": "AdvancedSchedulerSelector",
+    "SchedulerConfig": "SchedulerConfig",
     "FlowMatchScheduler": "FlowMatchScheduler",
-    "AdvancedFlowMatchScheduler": "AdvancedFlowMatchScheduler",
+    "FlowMatchSchedulerConfig": "FlowMatchSchedulerConfig",
     "ModelSelector": "ModelSelector",
     "UnsafeModelSelector": "UnsafeModelSelector",
     "LoraSelector": "LoraSelector",
