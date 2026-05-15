@@ -77,7 +77,7 @@ class HostManager:
         return
 
 
-    def get_from_address(self, address, endpoint, allow_error=False, pbar=None, wait=True):
+    def get_from_address(self, address, endpoint, allow_error=False, pbar=None):
         if not LOCAL_HOST in address: address = LOCAL_HOST + address
         if endpoint not in ["initialize", "progress"]:
             self.log(f"ℹ️ Sending GET request to: {address}/{endpoint}")
@@ -95,16 +95,12 @@ class HostManager:
 
         thread = threading.Thread(target=get,)
         thread.start()
-        if wait == True:
-            if pbar is not None:
-                while thread.is_alive():
-                    self.__update_pbar(address, pbar)
-                    time.sleep(1)
-            thread.join()
-        else:
-            if pbar is not None:
-                pbar.update_absolute(100)
-        time.sleep(1)
+        if pbar is not None:
+            pbar.update_absolute(0, total=100)
+            while thread.is_alive():
+                time.sleep(1)
+                self.__update_pbar(address, pbar)
+        thread.join()
         return results[0]
 
 
@@ -127,14 +123,17 @@ class HostManager:
         thread = threading.Thread(target=post,)
         thread.start()
         if pbar is not None:
+            pbar.update_absolute(0, total=100)
             while thread.is_alive():
-                self.__update_pbar(address, pbar)
                 time.sleep(1)
+                self.__update_pbar(address, pbar)
         thread.join()
         return results[0]
 
 
     def launch_host(self, config, pbar=None):
+        if pbar is not None:
+            pbar.update_absolute(0, total=100)
         port = str(config.get("port"))
         backend = config.get("backend")
         current_config = self.configs.get(str(port))
@@ -225,7 +224,7 @@ class HostManager:
                 pass
             time.sleep(1)
             if pbar is not None:
-                pbar.update_absolute(int(current/timeout*100), total=100)
+                pbar.update_absolute(int(current / timeout * 100), total=100)
             current += 1
             if current >= timeout:
                 self.close_host_process(port, "Timed out", with_assert="Failed to launch host within 30 seconds.\nCheck console for details.")

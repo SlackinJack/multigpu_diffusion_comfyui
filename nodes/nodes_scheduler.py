@@ -7,7 +7,7 @@ class SchedulerSelector:
     @classmethod
     def INPUT_TYPES(s): return {
         "required": {
-            "scheduler":    (["ddim", "ddpm", "deis", "dpm_2", "dpm_2_a", "dpm_sde", "dpmpp_2m", "dpmpp_2m_sde", "dpmpp_sde", "euler", "euler_a", "heun", "ipndm", "lms", "pndm", "tcd", "unipc"], { "default": "ddim" }),
+            "scheduler":    (["DDIM", "DDPM", "DEIS", "DPM2", "DPM2 a", "DPM SDE", "DPM++ 2M", "DPM++ 2M SDE", "DPM++ SDE", "Euler", "Euler a", "Heun", "LMS", "PNDM", "TCD", "UniPC"], { "default": "Euler" }),
         },
         "optional": {
             "config":       SCHEDULER_CONFIG,
@@ -26,11 +26,12 @@ class SchedulerConfig:
     @classmethod
     def INPUT_TYPES(s): return {
         "required": {
-            "num_train_timesteps":      ("INT", { "default": 1000, "min": 0, "step": 1 }),
+            "num_train_timesteps":      ("INT", { "default": 1000, "min": 0 }),
             "timestep_spacing":         (["default", "leading", "linspace", "trailing"], { "default": "default" }),
             "beta_schedule":            (["default", "linear", "scaled_linear", "squaredcos_cap_v2"], { "default": "default" }),
             "beta_start":               ("FLOAT", { "default": 0.00010, "min": 0.00000, "max": 1.00000, "step": 0.00001 }),
             "beta_end":                 ("FLOAT", { "default": 0.02000, "min": 0.00000, "max": 1.00000, "step": 0.00001 }),
+            "prediction_type":          (["default", "epsilon", "sample", "v_prediction"], { "default": "default" }),
             "use_karras_sigmas":        TRILEAN_WITH_DEFAULT,
             "rescale_betas_zero_snr":   TRILEAN_WITH_DEFAULT,
             "use_exponential_sigmas":   TRILEAN_WITH_DEFAULT,
@@ -43,7 +44,7 @@ class SchedulerConfig:
         for k, v in kwargs.items():
             if k in ["num_train_timesteps", "beta_start", "beta_end"]:
                 scheduler_config[k] = v
-            elif k in ["timestep_spacing", "beta_schedule"]:
+            elif k in ["timestep_spacing", "beta_schedule", "prediction_type"]:
                 if v != "default": scheduler_config[k] = v
             elif trilean(v) != None:
                 scheduler_config[k] = trilean(v)
@@ -53,7 +54,7 @@ class SchedulerConfig:
 class FlowMatchScheduler:
     @classmethod
     def INPUT_TYPES(s): return {
-        "required": { "scheduler": (["fm_euler", "fm_heun"], {"default": "fm_euler"}) },
+        "required": { "scheduler": (["FM Euler", "FM Heun"], {"default": "FM Euler"}) },
         "optional": { "config": SCHEDULER_CONFIG }
     }
     RETURN_TYPES, FUNCTION, CATEGORY = FM_SCHEDULER, "get", ROOT_CATEGORY_GENERAL
@@ -69,7 +70,7 @@ class FlowMatchSchedulerConfig:
     @classmethod
     def INPUT_TYPES(s): return {
         "required": {
-            "num_train_timesteps":      ("INT", { "default": 1000, "min": 0, "step": 1 }),
+            "num_train_timesteps":      ("INT", { "default": 1000, "min": 0 }),
             "shift":                    ("FLOAT", { "default": 1.00000, "min": 0.00001, "step": 0.00001 }),
             "use_dynamic_shifting":     TRILEAN_WITH_DEFAULT,
             "base_shift":               ("FLOAT", { "default": 0.50000, "min": 0.00000, "step": 0.00001 }),
@@ -81,7 +82,7 @@ class FlowMatchSchedulerConfig:
             "use_karras_sigmas":        TRILEAN_WITH_DEFAULT,
             "use_exponential_sigmas":   TRILEAN_WITH_DEFAULT,
             "use_beta_sigmas":          TRILEAN_WITH_DEFAULT,
-            "time_shift_type":          (["exponential", "linear"], { "default": "exponential" }),
+            "time_shift_type":          (["default", "exponential", "linear"], { "default": "default" }),
             "stochastic_sampling":      TRILEAN_WITH_DEFAULT,
         }
     }
@@ -89,8 +90,10 @@ class FlowMatchSchedulerConfig:
     def get(self, **kwargs):
         scheduler_config = {}
         for k, v in kwargs.items():
-            if k in ["num_train_timesteps", "shift", "base_shift", "max_shift", "base_image_seq_len", "max_image_seq_len", "shift_terminal", "time_shift_type"]:
+            if k in ["num_train_timesteps", "shift", "base_shift", "max_shift", "base_image_seq_len", "max_image_seq_len", "shift_terminal"]:
                 scheduler_config[k] = v
+            elif k in ["time_shift_type"]:
+                if v != "default": scheduler_config[k] = v
             elif trilean(v) != None:
                 scheduler_config[k] = trilean(v)
         return (scheduler_config,)

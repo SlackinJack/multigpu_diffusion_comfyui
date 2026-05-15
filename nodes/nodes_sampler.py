@@ -165,7 +165,6 @@ class SDSampler:
             if controlnet_scale is not None: data["controlnet_scale"] = controlnet_scale
 
         pbar = ProgressBar(100)
-        pbar.update_absolute(0)
         response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         image_out, latent_out = response
@@ -250,7 +249,6 @@ class SDSamplerPrompt:
             if controlnet_scale is not None: data["controlnet_scale"] = controlnet_scale
 
         pbar = ProgressBar(100)
-        pbar.update_absolute(0)
         response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         image_out, latent_out = response
@@ -308,7 +306,6 @@ class SVDSampler:
         }
 
         pbar = ProgressBar(100)
-        pbar.update_absolute(0)
         response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         images = decode_b64_and_unpickle(response)
@@ -370,7 +367,6 @@ class SDUpscaleSampler:
 
             try:
                 pbar = ProgressBar(100)
-                pbar.update_absolute(0)
                 response = get_current_manager().get_result(host, data, pbar=pbar)
                 if response is not None:
                     get_current_manager().log(f"✅ Finished upscaling image: {i}/{len(images)}")
@@ -453,7 +449,6 @@ class FluxSampler:
         #     if controlnet_scale is not None: data["controlnet_scale"] = controlnet_scale
 
         pbar = ProgressBar(100)
-        pbar.update_absolute(0)
         response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         image_out, latent_out = response
@@ -519,7 +514,6 @@ class WanSampler:
             data["image"] = convert_tensor_to_b64(image)
 
         pbar = ProgressBar(100)
-        pbar.update_absolute(0)
         response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         images = decode_b64_and_unpickle(response)
@@ -603,7 +597,6 @@ class ZImageSampler:
         """
 
         pbar = ProgressBar(100)
-        pbar.update_absolute(0)
         response = get_current_manager().get_result(host, data, pbar=pbar)
         assert response is not None, "No media generated.\nCheck console for details."
         image_out, latent_out = response

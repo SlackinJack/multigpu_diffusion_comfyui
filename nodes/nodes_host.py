@@ -35,7 +35,6 @@ class CreateHost:
         kwargs["cuda_visible_devices"] = kwargs["cuda_visible_devices"].replace(" ", "")
         global hm
         pbar = ProgressBar(100)
-        pbar.update_absolute(0)
         host = hm.launch_host(kwargs, pbar=pbar)
         return (host,)
 
@@ -109,7 +108,6 @@ class ApplyPipeline:
                     continue
 
         pbar = ProgressBar(100)
-        pbar.update_absolute(0)
         response = hm.post_to_address(host, "apply", data, pbar=pbar)
         if response is None or response.status_code != 200:
             hm.close_host_process(host, "Failed to initialize pipeline", with_assert="Failed to initialize pipeline.\n\nCheck console for details.")
@@ -129,7 +127,6 @@ class SleepHost:
     def sleep_host(self, host, time, obj):
         global hm
         pbar = ProgressBar(100)
-        pbar.update_absolute(0)
         data = {"sleep": True, "time": time}
         response = hm.post_to_address(host, "sleep", data, pbar=pbar)
         # TODO: maybe do something with response
@@ -148,7 +145,6 @@ class OffloadPipeline:
     def offload_pipeline(self, host, wait_for_offload, obj):
         global hm
         pbar = ProgressBar(100)
-        pbar.update_absolute(0)
         response = hm.get_from_address(host, "offload", pbar=pbar)
         # TODO: maybe do something with response
         return (host, obj,)
