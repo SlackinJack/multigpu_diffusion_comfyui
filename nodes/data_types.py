@@ -75,9 +75,9 @@ HOST = ("MD_HOST",)
 HOST_CONFIG = ("MD_HOST_CONFIG",)
 BACKEND_CONFIG = ("MD_BACKEND_CONFIG",)
 BACKEND = (["asyncdiff", "balanced", "single"], { "default": "asyncdiff" })
-PORT = ("INT", { "default": 6000, "min": 1025, "max": 65535, "step": 1 })
-MASTER_PORT = ("INT", { "default": 29400, "min": 1025, "max": 65535, "step": 1 })
-PIPELINE_INIT_TIMEOUT = ("INT", { "default": 600, "min": 0, "max": INT_MAX, "step": 1 })
+PORT = ("INT", { "default": 6000, "min": 1025, "max": 65535 })
+MASTER_PORT = ("INT", { "default": 29400, "min": 1025, "max": 65535 })
+PIPELINE_INIT_TIMEOUT = ("INT", { "default": 600, "min": 0, "max": INT_MAX })
 
 
 SCHEDULER               = ("MD_SCHEDULER",)
@@ -94,20 +94,25 @@ ATTN_BACKEND_CONFIG     = ("MD_ATTN_BACKEND_CONFIG",)
 
 PROMPT                  = ("STRING", { "default": "", "multiline": True })
 RESOLUTION              = ("INT", { "default": 512, "min": 8, "max": INT_MAX, "step": 8 })
-SEED                    = ("INT", { "default": 0, "min": 0, "max": INT_MAX, "step": 1 })
-STEPS                   = ("INT", { "default": 60, "min": 1, "max": INT_MAX, "step": 1 })
-CLIP_SKIP               = ("INT", { "default": 0, "min": 0, "max": INT_MAX, "step": 1 })
-DENOISING_START_STEP    = ("INT", { "default": 0, "min": 0, "max": INT_MAX, "step": 1 })
-DENOISING_END_STEP      = ("INT", { "default": INT_MAX, "min": 1, "max": INT_MAX, "step": 1 })
+SEED                    = ("INT", { "default": 0, "min": 0, "max": INT_MAX })
+STEPS                   = ("INT", { "default": 60, "min": 1, "max": INT_MAX })
+CLIP_SKIP               = ("INT", { "default": 0, "min": 0, "max": INT_MAX })
+DENOISING_START_STEP    = ("INT", { "default": 0, "min": 0, "max": INT_MAX })
+DENOISING_END_STEP      = ("INT", { "default": INT_MAX, "min": 1, "max": INT_MAX })
 CFG                     = ("FLOAT", { "default": 7.00000, "min": 0, "max": INT_MAX, "step": 0.00001 })
 IP_ADAPTER_SCALE        = ("FLOAT", { "default": 0.50000, "min": 0.00000, "max": INT_MAX, "step": 0.00001 })
 CONTROLNET_SCALE        = ("FLOAT", { "default": 0.50000, "min": 0.00000, "max": INT_MAX, "step": 0.00001 })
 
 
+# Schedulers
+NUM_TRAIN_TIMESTEPS     = ("INT", { "default": 1000, "min": INT_MIN, "max": INT_MAX })
+STEPS_OFFSET            = ("INT", { "default": 0, "min": INT_MIN, "max": INT_MAX })
+
+
 # SVD
-DECODE_CHUNK_SIZE       = ("INT", { "default": 8, "min": 1, "max": INT_MAX, "step": 1 })
-NUM_FRAMES              = ("INT", { "default": 25, "min": 1, "max": INT_MAX, "step": 1 })
-MOTION_BUCKET_ID        = ("INT", { "default": 180, "min": 1, "max": INT_MAX, "step": 1 })
+DECODE_CHUNK_SIZE       = ("INT", { "default": 8, "min": 1, "max": INT_MAX })
+NUM_FRAMES              = ("INT", { "default": 25, "min": 1, "max": INT_MAX })
+MOTION_BUCKET_ID        = ("INT", { "default": 180, "min": 1, "max": INT_MAX })
 NOISE_AUG_STRENGTH      = ("FLOAT", { "default": 0.00001, "min": INT_MIN, "max": INT_MAX, "step": 0.00001 })
 SCALE_PERCENTAGE        = ("FLOAT", { "default": 100.00000, "min": 0.00001, "max": INT_MAX, "step": 0.00001 })
 
@@ -117,6 +122,7 @@ ROOT_CATEGORY_CONFIG = f"{ROOT_CATEGORY}/Configuration"
 ROOT_CATEGORY_GENERAL = f"{ROOT_CATEGORY}/General"
 ROOT_CATEGORY_TOOLS = f"{ROOT_CATEGORY}/Tools"
 ROOT_CATEGORY_SAMPLERS = f"{ROOT_CATEGORY}/Samplers"
+ROOT_CATEGORY_SCHEDULERS = f"{ROOT_CATEGORY}/Schedulers"
 ASYNCDIFF_CATEGORY = f"{ROOT_CATEGORY_SAMPLERS}/AsyncDiff"
 
 
