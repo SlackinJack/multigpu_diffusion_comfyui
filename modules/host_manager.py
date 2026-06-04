@@ -100,6 +100,7 @@ class HostManager:
             while thread.is_alive():
                 time.sleep(1)
                 self.__update_pbar(address, pbar)
+            pbar.update_absolute(100, total=100)
         thread.join()
         return results[0]
 
@@ -127,6 +128,7 @@ class HostManager:
             while thread.is_alive():
                 time.sleep(1)
                 self.__update_pbar(address, pbar)
+            pbar.update_absolute(100, total=100)
         thread.join()
         return results[0]
 
