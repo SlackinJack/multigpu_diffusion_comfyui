@@ -13,6 +13,7 @@ ASYNCDIFF_CONFIGS = {
     "stride":       ("INT", { "default": 1, "min": 1 }),
     "synced_steps": ("INT", { "default": 10, "min": 0 }),
     "time_shift":   ("INT", { "default": 0, "min": 0 }),
+    "shifted_steps": ("INT", { "default": 0, "min": 0 }),
     "cached_step":  ("INT", { "default": 1, "min": 1 }),
 }
 

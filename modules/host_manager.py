@@ -1,4 +1,4 @@
-import errno
+﻿import errno
 import json
 import logging
 import os
@@ -188,18 +188,17 @@ class HostManager:
         #     has_accelerate = True
         # except: pass
 
-        match backend:
-            case "asyncdiff":
-                # if has_accelerate == True:  cmd = ["accelerate", "launch",  f'--main_process_port={config["master_port"]}', f'--num_processes={config["nproc_per_node"]}']
-                # else:                       cmd = ["torchrun",              f'--master-port={config["master_port"]}',       f'--nproc_per_node={config["nproc_per_node"]}']
-                cmd = ["torchrun", f'--master-port={config["master_port"]}']
-                if len(config["cuda_visible_devices"]) > 0:
-                    cmd += [f'--nproc_per_node={len(config["cuda_visible_devices"].split(","))}']
-                else:
-                    cmd += [f'--nproc_per_node={torch.cuda.device_count()}']
-            case _:
-                cmd = ["python3"]
-                # raise NotImplementedError
+        if backend in ["asyncdiff"]:
+            # if has_accelerate == True:  cmd = ["accelerate", "launch",  f'--main_process_port={config["master_port"]}', f'--num_processes={config["nproc_per_node"]}']
+            # else:                       cmd = ["torchrun",              f'--master-port={config["master_port"]}',       f'--nproc_per_node={config["nproc_per_node"]}']
+            cmd = ["torchrun", f'--master-port={config["master_port"]}']
+            if len(config["cuda_visible_devices"]) > 0:
+                cmd += [f'--nproc_per_node={len(config["cuda_visible_devices"].split(","))}']
+            else:
+                cmd += [f'--nproc_per_node={torch.cuda.device_count()}']
+        else:
+            cmd = ["python3"]
+            # raise NotImplementedError
         cmd += [f'{get_node_dir()}/multigpu_diffusion/host_{backend}.py', f'--port={port}']
 
         cmd_string = ""
@@ -216,7 +215,7 @@ class HostManager:
         self.__set_config_for_address(port, new_config)
 
         current = 0
-        timeout = 30
+        timeout = 60
         while True:
             try:
                 response = self.get_from_address(LOCAL_HOST + port, "initialize", allow_error=True)
