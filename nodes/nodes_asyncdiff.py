@@ -9,12 +9,13 @@ from ..multigpu_diffusion.modules.utils import *
 
 
 ASYNCDIFF_CONFIGS = {
-    "model_n":      ("INT", { "default": 2, "min": 1 }),
-    "stride":       ("INT", { "default": 1, "min": 1 }),
-    "synced_steps": ("INT", { "default": 10, "min": 0 }),
-    "time_shift":   ("INT", { "default": 0, "min": 0 }),
-    "shifted_steps": ("INT", { "default": 0, "min": 0 }),
-    "cached_step":  ("INT", { "default": 1, "min": 1 }),
+    "model_n":              ("INT", { "default": 2, "min": 1 }),
+    "stride":               ("INT", { "default": 1, "min": 1 }),
+    "synced_steps":         ("INT", { "default": 10, "min": 0 }),
+    "time_shift":           ("INT", { "default": 0, "min": 0 }),
+    "shifted_steps":        ("INT", { "default": 0, "min": 0 }),
+    "cached_step":          ("INT", { "default": 1, "min": 1 }),
+    "ramped_time_shift":    BOOLEAN_DEFAULT_FALSE,
 }
 
 

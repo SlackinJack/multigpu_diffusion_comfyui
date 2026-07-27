@@ -28,7 +28,7 @@ LATENT = ("LATENT",)
 
 VARIANT = (["bf16", "fp16", "fp32"], { "default": "fp16" })
 COMPEL_MODEL_LIST = (["sd1", "sd2", "sdxl"], { "default": "sdxl" })
-SUPPORTED_MODEL_LIST = (["flux", "sd1", "sd2", "sd3", "sdup", "sdxl", "svd", "want2v", "wani2v", "zimage"], { "default": "sdxl" }) # "ad"
+SUPPORTED_MODEL_LIST = (["flux", "krea2", "sd1", "sd2", "sd3", "sdup", "sdxl", "svd", "want2v", "wani2v", "zimage"], { "default": "sdxl" }) # "ad"
 ATTN_BACKEND_LIST = ([
     "native",
     "flex",
@@ -90,6 +90,8 @@ GROUP_OFFLOAD_CONFIG    = ("MD_GROUP_OFFLOAD_CONFIG",)
 OFFLOAD_CONFIG          = ("MD_OFFLOAD_CONFIG",)
 COMPILE_CONFIG          = ("MD_COMPILE_CONFIG",)
 ATTN_BACKEND_CONFIG     = ("MD_ATTN_BACKEND_CONFIG",)
+TIMESTEPS               = ("MD_TIMESTEPS",)
+SIGMAS                  = ("MD_SIGMAS",)
 
 
 PROMPT                  = ("STRING", { "default": "", "multiline": True })

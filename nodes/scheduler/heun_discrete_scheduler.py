@@ -20,13 +20,16 @@ class HeunDiscreteScheduler:
             "use_beta_sigmas":          TRILEAN_WITH_DEFAULT,
             "timestep_spacing":         (["default", "leading", "linspace", "trailing"], { "default": "default" }),
             "steps_offset":             STEPS_OFFSET,
+        },
+        "optional": {
+            "timesteps":                TIMESTEPS,
         }
     }
     RETURN_TYPES, FUNCTION, CATEGORY = SCHEDULER, "get", ROOT_CATEGORY_SCHEDULERS
     def get(self, **kwargs):
         scheduler_config = { "scheduler": "Heun" }
         for k, v in kwargs.items():
-            if k in ["num_train_timesteps", "beta_start", "beta_end", "clip_sample_range", "steps_offset"]:
+            if k in ["num_train_timesteps", "beta_start", "beta_end", "clip_sample_range", "steps_offset", "timesteps"]:
                 scheduler_config[k] = v
             elif k in ["beta_schedule", "prediction_type", "timestep_spacing"]:
                 if v != "default": scheduler_config[k] = v

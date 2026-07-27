@@ -30,13 +30,16 @@ class DPMSolverSinglestepScheduler:
             "variance_type":            (["default", "learned", "learned_range"], { "default": "default" }),
             "use_dynamic_shifting":     TRILEAN_WITH_DEFAULT,
             "time_shift_type":          (["default", "exponential"], { "default": "default" }),
+        },
+        "optional": {
+            "timesteps":                TIMESTEPS,
         }
     }
     RETURN_TYPES, FUNCTION, CATEGORY = SCHEDULER, "get", ROOT_CATEGORY_SCHEDULERS
     def get(self, **kwargs):
         scheduler_config = { "scheduler": "DPM++ SDE" }
         for k, v in kwargs.items():
-            if k in ["num_train_timesteps", "beta_start", "beta_end", "solver_order", "dynamic_thresholding_ratio", "sample_max_value", "flow_shift"]:
+            if k in ["num_train_timesteps", "beta_start", "beta_end", "solver_order", "dynamic_thresholding_ratio", "sample_max_value", "flow_shift", "timesteps"]:
                 scheduler_config[k] = v
             elif k in ["beta_schedule", "prediction_type", "algorithm_type", "solver_type", "final_sigmas_type", "variance_type", "time_shift_type"]:
                 if v != "default": scheduler_config[k] = v

@@ -127,10 +127,27 @@ class CompileConfig:
 
 class AttentionBackendConfig:
     @classmethod
-    def INPUT_TYPES(s): return {
-        "required": {
-            "backend": ATTN_BACKEND_LIST,
-        }
-    }
+    def INPUT_TYPES(s): return { "required": { "backend": ATTN_BACKEND_LIST } }
     RETURN_TYPES, FUNCTION, CATEGORY = ATTN_BACKEND_CONFIG, "get_config", ROOT_CATEGORY_CONFIG
     def get_config(self, **kwargs): return (kwargs,)
+
+
+class CustomTimesteps:
+    @classmethod
+    def INPUT_TYPES(s): return { "required": { "timesteps_csv": ("STRING", { "default": "999, 499, 0", "multiline": True }) } }
+    RETURN_TYPES, FUNCTION, CATEGORY = TIMESTEPS, "get_timesteps", ROOT_CATEGORY_CONFIG
+    def get_timesteps(self, timesteps_csv): 
+        t = timesteps_csv.replace("\n", "").replace(" ", "").split(",")
+        t = [float(x) for x in t]
+        t = [int(x) for x in t]
+        return (t,)
+
+
+class CustomSigmas:
+    @classmethod
+    def INPUT_TYPES(s): return { "required": { "sigmas_csv": ("STRING", { "default": "14.20, 7.10, 3.55", "multiline": True }) } }
+    RETURN_TYPES, FUNCTION, CATEGORY = SIGMAS, "get_sigmas", ROOT_CATEGORY_CONFIG
+    def get_sigmas(self, sigmas_csv):
+        s = sigmas_csv.replace("\n", "").replace(" ", "").split(",")
+        s = [float(x) for x in s]
+        return (s,)

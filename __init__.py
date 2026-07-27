@@ -15,6 +15,8 @@ NODE_CLASS_MAPPINGS = {
     "UnsafeModelSelector": UnsafeModelSelector,
     "LoraSelector": LoraSelector,
     "MultiLoraJoiner": MultiLoraJoiner,
+    "CustomTimesteps": CustomTimesteps,
+    "CustomSigmas": CustomSigmas,
 
     "FlowMatchScheduler": nodes_scheduler.FlowMatchScheduler,
     "FlowMatchSchedulerConfig": nodes_scheduler.FlowMatchSchedulerConfig,
@@ -62,6 +64,7 @@ NODE_CLASS_MAPPINGS = {
     "SVDSampler": SVDSampler,
     "WanSampler": WanSampler,
     "ZImageSampler": ZImageSampler,
+    "Krea2Sampler": Krea2Sampler,
 }
 
 
@@ -71,6 +74,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "UnsafeModelSelector": "UnsafeModelSelector",
     "LoraSelector": "LoraSelector",
     "MultiLoraJoiner": "MultiLoraJoiner",
+    "CustomTimesteps": "CustomTimesteps",
+    "CustomSigmas": "CustomSigmas",
 
     "FlowMatchScheduler": "FlowMatchScheduler",
     "FlowMatchSchedulerConfig": "FlowMatchSchedulerConfig",
@@ -118,6 +123,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SVDSampler": "SVDSampler",
     "WanSampler": "WanSampler",
     "ZImageSampler": "ZImageSampler",
+    "Krea2Sampler": "Krea2Sampler",
 }
 
 

@@ -8,8 +8,8 @@ class EulerDiscreteScheduler:
     def INPUT_TYPES(s): return {
         "required": {
             "num_train_timesteps":      NUM_TRAIN_TIMESTEPS,
-            "beta_start":               ("FLOAT", { "default": 0.00010, "min": 0.00000, "max": 1.00000, "step": 0.00001 }),
-            "beta_end":                 ("FLOAT", { "default": 0.02000, "min": 0.00000, "max": 1.00000, "step": 0.00001 }),
+            "beta_start":               ("FLOAT", { "default": 0.00085, "min": 0.00000, "max": 1.00000, "step": 0.00001 }),
+            "beta_end":                 ("FLOAT", { "default": 0.01200, "min": 0.00000, "max": 1.00000, "step": 0.00001 }),
             "beta_schedule":            (["default", "linear", "scaled_linear", "squaredcos_cap_v2"], { "default": "default" }),
             # "trained_betas"
             "prediction_type":          (["default", "epsilon", "sample", "v_prediction"], { "default": "default" }),
@@ -24,13 +24,17 @@ class EulerDiscreteScheduler:
             "steps_offset":             STEPS_OFFSET,
             "rescale_betas_zero_snr":   TRILEAN_WITH_DEFAULT,
             "final_sigma_type":         (["default", "zero", "sigma_min"], { "default": "default" }),
+        },
+        "optional": {
+            "timesteps":                TIMESTEPS,
+            "sigmas":                   SIGMAS,
         }
     }
     RETURN_TYPES, FUNCTION, CATEGORY = SCHEDULER, "get", ROOT_CATEGORY_SCHEDULERS
     def get(self, **kwargs):
         scheduler_config = { "scheduler": "Euler" }
         for k, v in kwargs.items():
-            if k in ["num_train_timesteps", "beta_start", "beta_end", "steps_offset"]:
+            if k in ["num_train_timesteps", "beta_start", "beta_end", "steps_offset", "timesteps", "sigmas"]:
                 scheduler_config[k] = v
             elif k in ["beta_schedule", "prediction_type", "interpolation_type", "timestep_spacing", "timestep_type", "final_sigma_type"]:
                 if v != "default": scheduler_config[k] = v

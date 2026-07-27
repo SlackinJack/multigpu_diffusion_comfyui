@@ -22,13 +22,16 @@ class DDPMScheduler:
             "timestep_spacing":         (["default", "leading", "linspace", "trailing"], { "default": "default" }),
             "steps_offset":             STEPS_OFFSET,
             "rescale_betas_zero_snr":   TRILEAN_WITH_DEFAULT,
+        },
+        "optional": {
+            "timesteps":                TIMESTEPS,
         }
     }
     RETURN_TYPES, FUNCTION, CATEGORY = SCHEDULER, "get", ROOT_CATEGORY_SCHEDULERS
     def get(self, **kwargs):
         scheduler_config = { "scheduler": "DDPM" }
         for k, v in kwargs.items():
-            if k in ["num_train_timesteps", "beta_start", "beta_end", "clip_sample_range", "dynamic_thresholding_ratio", "sample_max_value", "steps_offset"]:
+            if k in ["num_train_timesteps", "beta_start", "beta_end", "clip_sample_range", "dynamic_thresholding_ratio", "sample_max_value", "steps_offset", "timesteps"]:
                 scheduler_config[k] = v
             elif k in ["beta_schedule", "variance_type", "prediction_type", "timestep_spacing"]:
                 if v != "default": scheduler_config[k] = v

@@ -8,8 +8,8 @@ class EulerAncestralDiscreteScheduler:
     def INPUT_TYPES(s): return {
         "required": {
             "num_train_timesteps":      NUM_TRAIN_TIMESTEPS,
-            "beta_start":               ("FLOAT", { "default": 0.00010, "min": 0.00000, "max": 1.00000, "step": 0.00001 }),
-            "beta_end":                 ("FLOAT", { "default": 0.02000, "min": 0.00000, "max": 1.00000, "step": 0.00001 }),
+            "beta_start":               ("FLOAT", { "default": 0.00085, "min": 0.00000, "max": 1.00000, "step": 0.00001 }),
+            "beta_end":                 ("FLOAT", { "default": 0.01200, "min": 0.00000, "max": 1.00000, "step": 0.00001 }),
             "beta_schedule":            (["default", "linear", "scaled_linear", "squaredcos_cap_v2"], { "default": "default" }),
             # "trained_betas"
             "prediction_type":          (["default", "epsilon", "sample", "v_prediction"], { "default": "default" }),
