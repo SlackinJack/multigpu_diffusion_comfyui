@@ -59,7 +59,6 @@ class HostManager:
 
 
     def __update_config_pipeline(self, address, value):
-        # config = self.__get_config_by_address(address)
         address = address.replace(LOCAL_HOST, "")
         config = self.configs.get(address)
         if config is None:  self.close_host_process(address, "Host not active", with_assert="Host not active.\nCheck console for details.")

@@ -4,8 +4,8 @@ from .nodes.nodes_general import *
 from .nodes.nodes_host import *
 from .nodes.nodes_model import *
 from .nodes.nodes_quantization import *
-from .nodes.nodes_sampler import *
 from .nodes.nodes_single import *
+from .nodes.sampler import *
 from .nodes.scheduler import *
 
 
@@ -56,14 +56,14 @@ NODE_CLASS_MAPPINGS = {
     "SleepHost": SleepHost,
     "OffloadPipeline": OffloadPipeline,
 
-    # "ADSampler": ADSampler,
-    "FluxSampler": FluxSampler,
-    "SDSampler": SDSampler,
-    "SDUpscaleSampler": SDUpscaleSampler,
-    "SVDSampler": SVDSampler,
-    "WanSampler": WanSampler,
-    "ZImageSampler": ZImageSampler,
-    "Krea2Sampler": Krea2Sampler,
+    # "ADSampler": ad_sampler.ADSampler,
+    "FluxSampler": flux_sampler.FluxSampler,
+    "SDSampler": sd_sampler.SDSampler,
+    "SDUpscaleSampler": sdup_sampler.SDUpscaleSampler,
+    "SVDSampler": svd_sampler.SVDSampler,
+    "WanSampler": wan_sampler.WanSampler,
+    "ZImageSampler": zimage_sampler.ZImageSampler,
+    "Krea2Sampler": krea2_sampler.Krea2Sampler,
 }
 
 
