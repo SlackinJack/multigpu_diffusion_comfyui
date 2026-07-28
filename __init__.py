@@ -35,7 +35,7 @@ NODE_CLASS_MAPPINGS = {
     "TCDScheduler": tcd_scheduler.TCDScheduler,
     "UniPCMultistepScheduler": unipc_multistep_scheduler.UniPCMultistepScheduler,
 
-    "EncodePromptWithCompel": EncodePromptWithCompel,
+    # "EncodePromptWithCompel": EncodePromptWithCompel,
 
     "AsyncDiffConfig": AsyncDiffConfig,
     "BalancedConfig": BalancedConfig,
@@ -43,7 +43,6 @@ NODE_CLASS_MAPPINGS = {
     "BitsAndBytesQuantizationConfig": BitsAndBytesQuantizationConfig,
     "QuantoQuantizationConfig": QuantoQuantizationConfig,
     "SDNQQuantizationConfig": SDNQQuantizationConfig,
-    "TorchAOQuantizationConfig": TorchAOQuantizationConfig,
     "TorchConfig": TorchConfig,
     "CompileConfig": CompileConfig,
     "QuantizationConfig": QuantizationConfig,
@@ -94,7 +93,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TCDScheduler": "TCDScheduler",
     "UniPCMultistepScheduler": "UniPCMultistepScheduler",
 
-    "EncodePromptWithCompel": "EncodePromptWithCompel",
+    # "EncodePromptWithCompel": "EncodePromptWithCompel",
 
     "AsyncDiffConfig": "AsyncDiffConfig",
     "BalancedConfig": "BalancedConfig",
@@ -102,7 +101,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "BitsAndBytesQuantizationConfig": "BitsAndBytesQuantizationConfig",
     "QuantoQuantizationConfig": "QuantoQuantizationConfig",
     "SDNQQuantizationConfig": "SDNQQuantizationConfig",
-    "TorchAOQuantizationConfig": "TorchAOQuantizationConfig",
     "TorchConfig": "TorchConfig",
     "CompileConfig": "CompileConfig",
     "QuantizationConfig": "QuantizationConfig",

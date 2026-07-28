@@ -73,22 +73,6 @@ class SDNQQuantizationConfig:
         return (out,)
 
 
-class TorchAOQuantizationConfig:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                # "quant_type": (["int4wo", "int4dq", "int8wo", "int8dq", "uint1wo", "uint2wo", "uint3wo", "uint4wo", "uint5wo", "uint6wo", "uint7wo", "float8wo"], { "default": "int8dq" }),
-                "quant_type":  ("STRING",),
-            }
-        }
-    RETURN_TYPES, FUNCTION, CATEGORY = MODEL_QUANT_CONFIG, "get_config", ROOT_CATEGORY_CONFIG
-    def get_config(self, **kwargs):
-        # return (f"tao,{quantize_to}",)
-        kwargs["backend"] = "torchao"
-        return (kwargs,)
-
-
 class QuantizationConfig:
     @classmethod
     def INPUT_TYPES(s): return {

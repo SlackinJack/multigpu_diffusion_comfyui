@@ -1,3 +1,7 @@
 __pycache__
 */__pycache__
 multigpu_diffusion
+.venv
+.venv*
+.venv_tf4
+.venv_tf5

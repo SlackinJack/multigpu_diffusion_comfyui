@@ -3,7 +3,7 @@ import os
 import torch
 
 
-from compel import Compel, ReturnedEmbeddingsType
+# from compel import Compel, ReturnedEmbeddingsType
 from diffusers import AutoPipelineForText2Image, StableDiffusionPipeline, StableDiffusionXLPipeline
 
 
@@ -12,6 +12,7 @@ from .nodes_host import get_current_manager
 from ..multigpu_diffusion.modules.utils import *
 
 
+"""
 class EncodePromptWithCompel:
     @classmethod
     def INPUT_TYPES(s): return {
@@ -52,6 +53,7 @@ class EncodePromptWithCompel:
         del pipe
         gc.collect()
         return ([[embeds, { "pooled_output": pooled_embeds }]],)
+"""
 
 
 class TorchConfig:

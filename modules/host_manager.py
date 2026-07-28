@@ -191,13 +191,15 @@ class HostManager:
         if backend in ["asyncdiff"]:
             # if has_accelerate == True:  cmd = ["accelerate", "launch",  f'--main_process_port={config["master_port"]}', f'--num_processes={config["nproc_per_node"]}']
             # else:                       cmd = ["torchrun",              f'--master-port={config["master_port"]}',       f'--nproc_per_node={config["nproc_per_node"]}']
-            cmd = ["torchrun", f'--master-port={config["master_port"]}']
+            # relative to comfy root
+            venv_source = f"custom_nodes/multigpu_diffusion_comfyui/.venv_tf{config["transformers_version"]}/bin/activate"
+            cmd = ["source", venv_source, "&&", "torchrun", f'--master-port={config["master_port"]}']
             if len(config["cuda_visible_devices"]) > 0:
                 cmd += [f'--nproc_per_node={len(config["cuda_visible_devices"].split(","))}']
             else:
                 cmd += [f'--nproc_per_node={torch.cuda.device_count()}']
         else:
-            cmd = ["python3"]
+            cmd = ["source", venv_source, "&&", "python3"]
             # raise NotImplementedError
         cmd += [f'{get_node_dir()}/multigpu_diffusion/host_{backend}.py', f'--port={port}']
 
@@ -205,7 +207,7 @@ class HostManager:
         for c in cmd: cmd_string += "\n        " + str(c)
         self.log(f'🟢 Starting host: {cmd_string}')
 
-        process = subprocess.Popen(cmd)
+        process = subprocess.Popen(["bash", "-lc"] + [" ".join(cmd)])
         new_config = {
             "process": process,
             "backend": backend,
