@@ -9,6 +9,7 @@ import threading
 import time
 import torch
 import traceback
+from termcolor import colored
 
 
 from ..multigpu_diffusion.modules.utils import *
@@ -35,7 +36,7 @@ class HostManager:
             logger.handlers.clear()
         handler = logging.StreamHandler()
         handler.setLevel(logging.INFO)
-        formatter = logging.Formatter(fmt=f'[ Node ]: %(message)s')
+        formatter = logging.Formatter(fmt=colored(f'[ Node ]: %(message)s', "white", attrs=["bold"]))
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         logger.propagate = False
@@ -190,8 +191,7 @@ class HostManager:
         if backend in ["asyncdiff"]:
             # if has_accelerate == True:  cmd = ["accelerate", "launch",  f'--main_process_port={config["master_port"]}', f'--num_processes={config["nproc_per_node"]}']
             # else:                       cmd = ["torchrun",              f'--master-port={config["master_port"]}',       f'--nproc_per_node={config["nproc_per_node"]}']
-            # relative to comfy root
-            venv_source = f"custom_nodes/multigpu_diffusion_comfyui/.venv_tf{config["transformers_version"]}/bin/activate"
+            venv_source = f"{get_node_dir()}/.venv_tf{config["transformers_version"]}/bin/activate"
             cmd = ["source", venv_source, "&&", "torchrun", f'--master-port={config["master_port"]}']
             if len(config["cuda_visible_devices"]) > 0:
                 cmd += [f'--nproc_per_node={len(config["cuda_visible_devices"].split(","))}']

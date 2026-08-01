@@ -1,0 +1,4 @@
+# unless you have a .venv you want to use for comfy, this requirements file
+# is not meant to be installed manually - you should use the setup.sh instead
+
+termcolor

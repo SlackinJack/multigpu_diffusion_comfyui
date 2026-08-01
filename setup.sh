@@ -46,5 +46,11 @@ rm req_async.txt req_multi.txt
 
 
 echo ""
+echo "########## Setup node requirements ##########"
+echo ""
+pip install --no-cache-dir -r requirements.txt
+
+
+echo ""
 echo "########## Setup complete, enjoy! ##########"
 echo ""
