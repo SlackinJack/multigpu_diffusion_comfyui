@@ -28,6 +28,9 @@ class CreateHost:
             "cuda_visible_devices": ("STRING", { "default": "", "multiline": False }),
             "transformers_version": (["4", "5"], { "default": "4" }),
             "s33d": SEED,
+        },
+        "optional": {
+            "environment_vars": ENV_VARS_CONFIG,
         }
     }
     RETURN_TYPES, FUNCTION, CATEGORY = HOST, "create_host", ROOT_CATEGORY_GENERAL
@@ -72,6 +75,7 @@ class ApplyPipeline:
                 "enable_attention_slicing": BOOLEAN_DEFAULT_FALSE,
                 "xformers_efficient": BOOLEAN_DEFAULT_FALSE,
                 "sd_fuse_qkv_projections": BOOLEAN_DEFAULT_FALSE,
+                "logging_level": LOGGING_LEVEL,
             },
             "optional": {
                 "lora": LORA,
@@ -144,7 +148,7 @@ class OffloadPipeline:
         }
     }
     RETURN_TYPES, FUNCTION, CATEGORY = ("MD_HOST", "*",), "offload_pipeline", ROOT_CATEGORY_CONFIG
-    def offload_pipeline(self, host, wait_for_offload, obj):
+    def offload_pipeline(self, host, obj):
         global hm
         pbar = ProgressBar(100)
         response = hm.get_from_address(host, "offload", pbar=pbar)

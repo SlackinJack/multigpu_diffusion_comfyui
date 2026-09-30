@@ -29,8 +29,8 @@ echo ""
 cp multigpu_diffusion/tf_4_requirements.txt req_multi.txt
 cp multigpu_diffusion/AsyncDiff/requirements.txt req_async.txt
 python3 -m venv .venv_tf4
-source .venv_tf4/bin/activate && pip install --no-cache-dir -r req_async.txt
-source .venv_tf4/bin/activate && pip install --no-cache-dir -r req_multi.txt
+source .venv_tf4/bin/activate && pip install --no-build-isolation -r req_async.txt
+source .venv_tf4/bin/activate && pip install --no-build-isolation -r req_multi.txt
 rm req_async.txt req_multi.txt
 
 
@@ -40,15 +40,15 @@ echo ""
 cp multigpu_diffusion/tf_5_requirements.txt req_multi.txt
 cp multigpu_diffusion/AsyncDiff/requirements.txt req_async.txt
 python3 -m venv .venv_tf5
-source .venv_tf5/bin/activate && pip install --no-cache-dir -r req_async.txt
-source .venv_tf5/bin/activate && pip install --no-cache-dir -r req_multi.txt
+source .venv_tf5/bin/activate && pip install --no-build-isolation -r req_async.txt
+source .venv_tf5/bin/activate && pip install --no-build-isolation -r req_multi.txt
 rm req_async.txt req_multi.txt
 
 
 echo ""
 echo "########## Setup node requirements ##########"
 echo ""
-pip install --no-cache-dir -r requirements.txt
+pip install --no-build-isolation -r requirements.txt
 
 
 echo ""

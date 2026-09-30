@@ -1,10 +1,16 @@
 import gc
+import numpy as np
 import os
+import random
 import torch
 
 
+from PIL import Image
 # from compel import Compel, ReturnedEmbeddingsType
-from diffusers import AutoPipelineForText2Image, StableDiffusionPipeline, StableDiffusionXLPipeline
+# from diffusers import AutoPipelineForText2Image, StableDiffusionPipeline, StableDiffusionXLPipeline
+
+
+import folder_paths
 
 
 from .data_types import *
@@ -134,6 +140,43 @@ class AttentionBackendConfig:
     def get_config(self, **kwargs): return (kwargs,)
 
 
+class EnvironmentVariable:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "key": ("STRING", { "default": "key", "multiline": False }),
+                "value": ("STRING", { "default": "value", "multiline": False }),
+            }
+        }
+    RETURN_TYPES, FUNCTION, CATEGORY = ENV_VARS_CONFIG, "get", ROOT_CATEGORY_CONFIG
+    def get(self, key, value):
+        return ({key:value},)
+
+
+class EnvironmentVariableJoiner:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "optional": {
+                "env1": ENV_VARS_CONFIG, "env2": ENV_VARS_CONFIG, "env3": ENV_VARS_CONFIG, "env4": ENV_VARS_CONFIG,
+                "env5": ENV_VARS_CONFIG, "env6": ENV_VARS_CONFIG, "env7": ENV_VARS_CONFIG, "env8": ENV_VARS_CONFIG, "env9": ENV_VARS_CONFIG,
+                "env10": ENV_VARS_CONFIG, "env11": ENV_VARS_CONFIG, "env12": ENV_VARS_CONFIG, "env13": ENV_VARS_CONFIG, "env14": ENV_VARS_CONFIG,
+                "env15": ENV_VARS_CONFIG, "env16": ENV_VARS_CONFIG, "env17": ENV_VARS_CONFIG, "env18": ENV_VARS_CONFIG, "env19": ENV_VARS_CONFIG,
+                "env20": ENV_VARS_CONFIG, "env21": ENV_VARS_CONFIG, "env22": ENV_VARS_CONFIG, "env23": ENV_VARS_CONFIG, "env24": ENV_VARS_CONFIG,
+                "env25": ENV_VARS_CONFIG, "env26": ENV_VARS_CONFIG, "env27": ENV_VARS_CONFIG, "env28": ENV_VARS_CONFIG, "env29": ENV_VARS_CONFIG,
+                "env30": ENV_VARS_CONFIG, "env31": ENV_VARS_CONFIG, "env32": ENV_VARS_CONFIG,
+            }
+        }
+    RETURN_TYPES, FUNCTION, CATEGORY = ENV_VARS_CONFIG, "join", ROOT_CATEGORY_CONFIG
+    def join(self, **kwargs):
+        out = {}
+        for k,v in kwargs.items():
+            for k2,v2 in v.items():
+                out[k2] = v2
+        return (out,)
+
+
 class CustomTimesteps:
     @classmethod
     def INPUT_TYPES(s): return { "required": { "timesteps_csv": ("STRING", { "default": "999, 499, 0", "multiline": True }) } }
@@ -153,3 +196,64 @@ class CustomSigmas:
         s = sigmas_csv.replace("\n", "").replace(" ", "").split(",")
         s = [float(x) for x in s]
         return (s,)
+
+
+class CustomSaveImage:
+    # A direct copy of ComfyUI's SaveImage, but with all metadata always disabled
+    def __init__(self):
+        self.output_dir = folder_paths.get_output_directory()
+        self.type = "output"
+        self.prefix_append = ""
+        self.compress_level = 0 # 4
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "images": ("IMAGE", {"tooltip": "The images to save."}),
+                "filename_prefix": ("STRING", {"default": "ComfyUI", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or %Empty Latent Image.width% to include values from nodes."})
+            },
+        }
+
+    RETURN_TYPES = ()
+    FUNCTION = "save_images"
+
+    OUTPUT_NODE = True
+
+    CATEGORY = "image"
+    DESCRIPTION = "Saves the input images to your ComfyUI output directory."
+
+    def save_images(self, images, filename_prefix="ComfyUI"):
+        filename_prefix += self.prefix_append
+        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
+        results = list()
+        for (batch_number, image) in enumerate(images):
+            i = 255. * image.cpu().numpy()
+            img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+
+            filename_with_batch_num = filename.replace("%batch_num%", str(batch_number))
+            file = f"{filename_with_batch_num}_{counter:05}_.png"
+            img.save(os.path.join(full_output_folder, file), compress_level=self.compress_level)
+            results.append({
+                "filename": file,
+                "subfolder": subfolder,
+                "type": self.type
+            })
+            counter += 1
+
+        return { "ui": { "images": results } }
+
+
+class CustomPreviewImage(CustomSaveImage):
+    # A direct copy of ComfyUI's PreviewImage, but with all metadata always disabled
+    def __init__(self):
+        self.output_dir = folder_paths.get_temp_directory()
+        self.type = "temp"
+        self.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for x in range(5))
+        self.compress_level = 0 # 1
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required":
+                    {"images": ("IMAGE", ), },
+                }

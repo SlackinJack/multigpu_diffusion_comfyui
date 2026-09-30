@@ -45,19 +45,24 @@ class SDNQQuantizationConfig:
         return {
             "required": {
                 # https://github.com/vladmandic/sdnext/wiki/SDNQ-Quantization
-                "quant_type": (["int16", "int8", "int7", "int6", "int5", "int4", "int3", "int2", "uint16", "uint8", "uint7", "uint6", "uint5", "uint4", "uint3", "uint2", "uint1", "float16", "float8_em4m3fn", "float7_em3m3fn", "float6_em3m2fn", "float5_em2m2fn", "float4_em2m1fn", "float3_em1m1fn", "float2_em1m0fn", "float1_em1m0fnu"], { "default": "int8" }),
-                "group_size": ("INT", { "default": 0, "min": -1, "max": INT_MAX }),
+                "weights_dtype": (["int16", "int8", "int7", "int6", "int5", "int4", "int3", "int2", "uint16", "uint8", "uint7", "uint6", "uint5", "uint4", "uint3", "uint2", "uint1", "float16", "float8_em4m3fn", "float7_em3m3fn", "float6_em3m2fn", "float5_em2m2fn", "float4_em2m1fn", "float3_em1m1fn", "float2_em1m0fn", "float1_em1m0fnu"], { "default": "int8" }),
+                "quantized_matmul_dtype": (['default', 'uint8', 'fp8', 'int8', 'fp16'], { "default": "default" }),
+                "group_size": (["auto", "row-wise", "tensor-wise"], { "default": "auto" }),
                 "use_svd": TRILEAN_WITH_DEFAULT,
                 "svd_rank": ("INT", { "default": 32, "min": INT_MIN, "max": INT_MAX }),
                 "svd_steps": ("INT", { "default": 8, "min": INT_MIN, "max": INT_MAX }),
                 "quant_conv": TRILEAN_WITH_DEFAULT,
+                "quant_embedding": TRILEAN_WITH_DEFAULT,
                 "use_quantized_matmul": TRILEAN_WITH_DEFAULT,
                 "use_quantized_matmul_conv": TRILEAN_WITH_DEFAULT,
                 "dequantize_fp32": TRILEAN_WITH_DEFAULT,
                 "non_blocking": TRILEAN_WITH_DEFAULT,
-                "use_static_quantization": TRILEAN_WITH_DEFAULT,
+                "use_dynamic_quantization": TRILEAN_WITH_DEFAULT,
                 "dynamic_loss_threshold": ("FLOAT", { "default": 0.01000, "step": 0.00001 }),
                 "use_stochastic_rounding": TRILEAN_WITH_DEFAULT,
+                "add_skip_keys": TRILEAN_WITH_DEFAULT,
+                "quantization_device": ("STRING", { "default": "cuda", "multiline": False }),
+                "return_device": ("STRING", { "default": "cuda", "multiline": False }),
             }
         }
     RETURN_TYPES, FUNCTION, CATEGORY = MODEL_QUANT_CONFIG, "get_config", ROOT_CATEGORY_CONFIG
@@ -65,9 +70,17 @@ class SDNQQuantizationConfig:
         out = {}
         out["backend"] = "sdnq"
         for k,v in kwargs.items():
-            if k in ["use_svd", "quant_conv", "use_quantized_matmul", "use_quantized_matmul_conv", "dequantize_fp32", "non_blocking", "use_static_quantization", "use_stochastic_rounding"]:
+            if k in ["use_svd", "quant_conv", "quant_embedding", "use_quantized_matmul", "use_quantized_matmul_conv", "dequantize_fp32", "non_blocking", "use_dynamic_quantization", "use_stochastic_rounding", "add_skip_keys"]:
                 if trilean(v) != None:
                     out[k] = trilean(v)
+            elif k in ["quantized_matmul_dtype"]:
+                if v != "default":
+                    out[k] = v
+            elif k == "group_size":
+                match v:
+                    case "row-wise":    out[k] = -1
+                    case "tensor-wise": out[k] = -2
+                    case _:             out[k] = 0
             else:
                 out[k] = v
         return (out,)

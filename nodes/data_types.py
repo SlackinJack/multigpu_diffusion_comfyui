@@ -26,9 +26,27 @@ IMAGE = ("IMAGE",)
 LATENT = ("LATENT",)
 
 
-VARIANT = (["bf16", "fp16", "fp32"], { "default": "fp16" })
 COMPEL_MODEL_LIST = (["sd1", "sd2", "sdxl"], { "default": "sdxl" })
-SUPPORTED_MODEL_LIST = (["flux", "krea2", "sd1", "sd2", "sd3", "sdup", "sdxl", "svd", "want2v", "wani2v", "zimage"], { "default": "sdxl" }) # "ad"
+SUPPORTED_MODEL_LIST = ([
+    "flux1",
+    "flux2d",
+    "flux2k",
+    "krea2",
+    "sd1",
+    "sd2",
+    "sd3",
+    "sdup",
+    "sdxl",
+    "svd",
+    "want2v",
+    "wani2v",
+    "zimage"
+], { "default": "sdxl" }) # "ad"
+VARIANT = ([
+    "bf16",
+    "fp16",
+    "fp32"
+], { "default": "fp16" })
 ATTN_BACKEND_LIST = ([
     "native",
     "flex",
@@ -78,6 +96,7 @@ BACKEND = (["asyncdiff", "balanced", "single"], { "default": "asyncdiff" })
 PORT = ("INT", { "default": 6000, "min": 1025, "max": 65535 })
 MASTER_PORT = ("INT", { "default": 29400, "min": 1025, "max": 65535 })
 PIPELINE_INIT_TIMEOUT = ("INT", { "default": 600, "min": 0, "max": INT_MAX })
+LOGGING_LEVEL = (["basic", "info", "all"], { "default": "basic" })
 
 
 SCHEDULER               = ("MD_SCHEDULER",)
@@ -90,6 +109,7 @@ GROUP_OFFLOAD_CONFIG    = ("MD_GROUP_OFFLOAD_CONFIG",)
 OFFLOAD_CONFIG          = ("MD_OFFLOAD_CONFIG",)
 COMPILE_CONFIG          = ("MD_COMPILE_CONFIG",)
 ATTN_BACKEND_CONFIG     = ("MD_ATTN_BACKEND_CONFIG",)
+ENV_VARS_CONFIG         = ("MD_ENV_VARS_CONFIG",)
 TIMESTEPS               = ("MD_TIMESTEPS",)
 SIGMAS                  = ("MD_SIGMAS",)
 
@@ -129,6 +149,7 @@ ASYNCDIFF_CATEGORY = f"{ROOT_CATEGORY_SAMPLERS}/AsyncDiff"
 
 
 def trilean(value):
+    value = value.lower()
     if value == "true": return True
     if value == "false": return False
     return None

@@ -17,6 +17,8 @@ NODE_CLASS_MAPPINGS = {
     "MultiLoraJoiner": MultiLoraJoiner,
     "CustomTimesteps": CustomTimesteps,
     "CustomSigmas": CustomSigmas,
+    "CustomSaveImage": CustomSaveImage,
+    "CustomPreviewImage": CustomPreviewImage,
 
     "FlowMatchScheduler": nodes_scheduler.FlowMatchScheduler,
     "FlowMatchSchedulerConfig": nodes_scheduler.FlowMatchSchedulerConfig,
@@ -49,6 +51,8 @@ NODE_CLASS_MAPPINGS = {
     "GroupOffloadConfig": GroupOffloadConfig,
     "OffloadConfig": OffloadConfig,
     "AttentionBackendConfig": AttentionBackendConfig,
+    "EnvironmentVariable": EnvironmentVariable,
+    "EnvironmentVariableJoiner": EnvironmentVariableJoiner,
 
     "CreateHost": CreateHost,
     "CloseHost": CloseHost,
@@ -75,6 +79,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "MultiLoraJoiner": "MultiLoraJoiner",
     "CustomTimesteps": "CustomTimesteps",
     "CustomSigmas": "CustomSigmas",
+    "CustomSaveImage": "CustomSaveImage",
+    "CustomPreviewImage": "CustomPreviewImage",
 
     "FlowMatchScheduler": "FlowMatchScheduler",
     "FlowMatchSchedulerConfig": "FlowMatchSchedulerConfig",
@@ -107,6 +113,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "GroupOffloadConfig": "GroupOffloadConfig",
     "OffloadConfig": "OffloadConfig",
     "AttentionBackendConfig": "AttentionBackendConfig",
+    "EnvironmentVariable": "EnvironmentVariable",
+    "EnvironmentVariableJoiner": "EnvironmentVariableJoiner",
 
     "CreateHost": "CreateHost",
     "CloseHost": "CloseHost",

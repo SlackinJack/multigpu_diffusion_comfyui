@@ -181,6 +181,18 @@ class HostManager:
         os.environ["DIFFUSERS_NO_ADVISORY_WARNINGS"] = "1"
         os.environ["PYTHONWARNINGS"] = "ignore"
 
+        # HuggingFace offline mode
+        os.environ["HF_HUB_OFFLINE"] = "1"
+        os.environ["HF_DATASETS_OFFLINE"] = "1"
+        os.environ["TRANSFORMERS_OFFLINE"] = "1"
+        os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+        os.environ["DO_NOT_TRACK"] = "1"
+
+        if config.get("environment_vars") is not None:
+            env_vars = config.pop("environment_vars")
+            for k, v in env_vars.items():
+                os.environ[k] = str(v)
+
         # TODO: implement later, currently consistently slower than torchrun
         # has_accelerate = False
         # try:
@@ -188,10 +200,10 @@ class HostManager:
         #     has_accelerate = True
         # except: pass
 
+        venv_source = f"{get_node_dir()}/.venv_tf{config["transformers_version"]}/bin/activate"
         if backend in ["asyncdiff"]:
             # if has_accelerate == True:  cmd = ["accelerate", "launch",  f'--main_process_port={config["master_port"]}', f'--num_processes={config["nproc_per_node"]}']
             # else:                       cmd = ["torchrun",              f'--master-port={config["master_port"]}',       f'--nproc_per_node={config["nproc_per_node"]}']
-            venv_source = f"{get_node_dir()}/.venv_tf{config["transformers_version"]}/bin/activate"
             cmd = ["source", venv_source, "&&", "torchrun", f'--master-port={config["master_port"]}']
             if len(config["cuda_visible_devices"]) > 0:
                 cmd += [f'--nproc_per_node={len(config["cuda_visible_devices"].split(","))}']
