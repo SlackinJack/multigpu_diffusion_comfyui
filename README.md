@@ -5,6 +5,9 @@ ComfyUI nodes to run [multigpu_diffusion](https://github.com/SlackinJack/multigp
 (Basically, a ComfyUI front-end to Diffusers, with support for multi-GPU environments.)
 
 
+![Screenshot 1](/.gallery/workflow_example.png?raw=true "Screenshot 1")
+
+
 ## Notes:
 - Requires **Diffusers-format** checkpoints/models.
 - Does not (and will never) use native sampling.

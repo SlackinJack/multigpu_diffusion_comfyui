@@ -1,0 +1,1155 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "revision": 0,
+  "last_node_id": 49,
+  "last_link_id": 68,
+  "nodes": [
+    {
+      "id": 24,
+      "type": "PrimitiveInt",
+      "pos": [
+        -1250,
+        -400
+      ],
+      "size": [
+        270,
+        82
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            37
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveInt"
+      },
+      "widgets_values": [
+        1116922077174200,
+        "randomize"
+      ]
+    },
+    {
+      "id": 15,
+      "type": "CreateHost",
+      "pos": [
+        -950,
+        -325
+      ],
+      "size": [
+        282.1000061035156,
+        178
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "environment_vars",
+          "shape": 7,
+          "type": "MD_ENV_VARS_CONFIG",
+          "link": null
+        },
+        {
+          "name": "s33d",
+          "type": "INT",
+          "widget": {
+            "name": "s33d"
+          },
+          "link": 37
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MD_HOST",
+          "type": "MD_HOST",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CreateHost"
+      },
+      "widgets_values": [
+        6000,
+        29400,
+        "asyncdiff",
+        "",
+        "4",
+        0
+      ]
+    },
+    {
+      "id": 9,
+      "type": "PreviewImage",
+      "pos": [
+        3600,
+        625
+      ],
+      "size": [
+        505,
+        545
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 13
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 16,
+      "type": "AsyncDiffConfig",
+      "pos": [
+        -950,
+        350
+      ],
+      "size": [
+        295.6000061035156,
+        178
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MD_BACKEND_CONFIG",
+          "type": "MD_BACKEND_CONFIG",
+          "links": [
+            5
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "AsyncDiffConfig"
+      },
+      "widgets_values": [
+        4,
+        1,
+        4,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 8,
+      "type": "CloseHost",
+      "pos": [
+        2550,
+        700
+      ],
+      "size": [
+        270,
+        78
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "host",
+          "type": "MD_HOST",
+          "link": 55
+        },
+        {
+          "name": "obj",
+          "type": "*",
+          "link": 56
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            13
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CloseHost"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 39,
+      "type": "FlowMatchEulerDiscreteScheduler",
+      "pos": [
+        1425,
+        175
+      ],
+      "size": [
+        320.79998779296875,
+        390
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "timesteps",
+          "shape": 7,
+          "type": "MD_TIMESTEPS",
+          "link": null
+        },
+        {
+          "name": "sigmas",
+          "shape": 7,
+          "type": "MD_SIGMAS",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MD_FM_SCHEDULER",
+          "type": "MD_FM_SCHEDULER",
+          "links": [
+            57
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "FlowMatchEulerDiscreteScheduler"
+      },
+      "widgets_values": [
+        1000,
+        1,
+        "default",
+        0.5,
+        1.15,
+        256,
+        4096,
+        "default",
+        0,
+        "default",
+        "default",
+        "default",
+        "default",
+        "true"
+      ]
+    },
+    {
+      "id": 43,
+      "type": "FluxSampler",
+      "pos": [
+        1425,
+        700
+      ],
+      "size": [
+        400,
+        302
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "host",
+          "type": "MD_HOST",
+          "link": 54
+        },
+        {
+          "name": "latent",
+          "shape": 7,
+          "type": "LATENT",
+          "link": null
+        },
+        {
+          "name": "fm_scheduler",
+          "shape": 7,
+          "type": "MD_FM_SCHEDULER",
+          "link": 57
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MD_HOST",
+          "type": "MD_HOST",
+          "links": [
+            55
+          ]
+        },
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            56
+          ]
+        },
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "FluxSampler"
+      },
+      "widgets_values": [
+        "beautiful scenery nature glass bottle landscape, , purple galaxy bottle,",
+        "text, watermark",
+        512,
+        512,
+        0,
+        20,
+        1.1000000000000003
+      ]
+    },
+    {
+      "id": 5,
+      "type": "ApplyPipeline",
+      "pos": [
+        375,
+        675
+      ],
+      "size": [
+        299.01666259765625,
+        574
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "host",
+          "type": "MD_HOST",
+          "link": 4
+        },
+        {
+          "name": "backend_config",
+          "type": "MD_BACKEND_CONFIG",
+          "link": 5
+        },
+        {
+          "name": "checkpoint",
+          "type": "MD_MODEL",
+          "link": 6
+        },
+        {
+          "name": "lora",
+          "shape": 7,
+          "type": "MD_LORA",
+          "link": null
+        },
+        {
+          "name": "transformer",
+          "shape": 7,
+          "type": "MD_MODEL",
+          "link": null
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "MD_MODEL",
+          "link": null
+        },
+        {
+          "name": "control_net",
+          "shape": 7,
+          "type": "MD_MODEL",
+          "link": null
+        },
+        {
+          "name": "ip_adapter",
+          "shape": 7,
+          "type": "MD_MODEL",
+          "link": null
+        },
+        {
+          "name": "text_encoder",
+          "shape": 7,
+          "type": "MD_MODEL",
+          "link": null
+        },
+        {
+          "name": "text_encoder_2",
+          "shape": 7,
+          "type": "MD_MODEL",
+          "link": null
+        },
+        {
+          "name": "text_encoder_3",
+          "shape": 7,
+          "type": "MD_MODEL",
+          "link": null
+        },
+        {
+          "name": "compile_config",
+          "shape": 7,
+          "type": "MD_COMPILE_CONFIG",
+          "link": null
+        },
+        {
+          "name": "quantization_config",
+          "shape": 7,
+          "type": "MD_QUANT_CONFIG",
+          "link": 40
+        },
+        {
+          "name": "torch_config",
+          "shape": 7,
+          "type": "MD_TORCH_CONFIG",
+          "link": null
+        },
+        {
+          "name": "group_offload_config",
+          "shape": 7,
+          "type": "MD_GROUP_OFFLOAD_CONFIG",
+          "link": null
+        },
+        {
+          "name": "attn_backend_config",
+          "shape": 7,
+          "type": "MD_ATTN_BACKEND_CONFIG",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MD_HOST",
+          "type": "MD_HOST",
+          "links": [
+            54
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ApplyPipeline"
+      },
+      "widgets_values": [
+        "flux2k",
+        "fp16",
+        "fp16",
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        "all"
+      ]
+    },
+    {
+      "id": 49,
+      "type": "SDNQQuantizationConfig",
+      "pos": [
+        -950,
+        1575
+      ],
+      "size": [
+        396.3999938964844,
+        466
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MD_MODEL_QUANT_CONFIG",
+          "type": "MD_MODEL_QUANT_CONFIG",
+          "links": [
+            64,
+            65,
+            67,
+            68
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SDNQQuantizationConfig"
+      },
+      "widgets_values": [
+        "int4",
+        "int8",
+        "row-wise",
+        "false",
+        32,
+        8,
+        "false",
+        "false",
+        "false",
+        "false",
+        "true",
+        "false",
+        "true",
+        0.01,
+        "false",
+        "true",
+        "cuda",
+        "cpu"
+      ]
+    },
+    {
+      "id": 48,
+      "type": "MarkdownNote",
+      "pos": [
+        -2200,
+        550
+      ],
+      "size": [
+        425,
+        200
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "### This is an example workflow for running the following:\n- FLUX.2 Klein 9B\n- AsyncDiff, 4 GPUs, 4n1s\n- 4-bit quantization with SDNQ on the entire pipeline (except VAE)\n- Running in FP16\n- 512x512 @ 20 steps\n\n\n#### Of course, this is just the basics, and there are more nodes as well.<br>Further tuning for your hardware is required.\n##### Follow this workflow from left-to-right to how each node works."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 25,
+      "type": "QuantizationConfig",
+      "pos": [
+        -775,
+        2100
+      ],
+      "size": [
+        229.13333129882812,
+        106
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "transformer",
+          "shape": 7,
+          "type": "MD_MODEL_QUANT_CONFIG",
+          "link": 64
+        },
+        {
+          "name": "encoder",
+          "shape": 7,
+          "type": "MD_MODEL_QUANT_CONFIG",
+          "link": 65
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "MD_MODEL_QUANT_CONFIG",
+          "link": null
+        },
+        {
+          "name": "tokenizer",
+          "shape": 7,
+          "type": "MD_MODEL_QUANT_CONFIG",
+          "link": 67
+        },
+        {
+          "name": "misc",
+          "shape": 7,
+          "type": "MD_MODEL_QUANT_CONFIG",
+          "link": 68
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MD_QUANT_CONFIG",
+          "type": "MD_QUANT_CONFIG",
+          "links": [
+            40
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "QuantizationConfig"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 6,
+      "type": "CheckpointSelector",
+      "pos": [
+        -950,
+        975
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MD_MODEL",
+          "type": "MD_MODEL",
+          "links": [
+            6
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CheckpointSelector"
+      },
+      "widgets_values": [
+        "checkpoints/FLUX.2-klein-9B-SDNQ-4bit-dynamic-svd-r32"
+      ]
+    },
+    {
+      "id": 32,
+      "type": "Note",
+      "pos": [
+        -650,
+        975
+      ],
+      "size": [
+        575,
+        450
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "Select the checkpoint here.\nThis scans for folders in the directory \"models/checkpoints\".\nRemember, you need to use full Diffusers checkpoints.\nNote that pipeline .safetensors are not supported.\nYou can get the checkpoint here (use \"git clone\" command in your checkpoints folder):\n- https://huggingface.co/Disty0/FLUX.2-klein-9B-SDNQ-4bit-dynamic-svd-r32\n\n\n\n\n\n\n\n\nYou may also select a transformer/vae/etc. .safetensor using this ModelSelector.\nThis scans for .safetensors in \"models/unet\", \"models/vae\", etc.\nYou will also need to provide a config.json for your model.\n(Usually, reusing the config.json in the checkpoint itself will suffice.)\n\n\n\n\n\n\n\n\nIf you wish to use .gguf, .bin, or .ckpt, use this UnsafeModelSelector.\nAs the name implies, this uses models that are not .safetensors.\nAlways investigate non-.safetensor files and use your best judgement before using them.\nAgain, this requires a config.json as well."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 34,
+      "type": "UnsafeModelSelector",
+      "pos": [
+        -950,
+        1350
+      ],
+      "size": [
+        275,
+        82
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MD_MODEL",
+          "type": "MD_MODEL",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UnsafeModelSelector"
+      },
+      "widgets_values": [
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 33,
+      "type": "ModelSelector",
+      "pos": [
+        -950,
+        1175
+      ],
+      "size": [
+        275,
+        82
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MD_MODEL",
+          "type": "MD_MODEL",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ModelSelector"
+      },
+      "widgets_values": [
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 30,
+      "type": "Note",
+      "pos": [
+        -650,
+        -325
+      ],
+      "size": [
+        625,
+        525
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "Creates a new process on your machine to run Diffusers.\n\n\nParameters:\n\n\n- Port: The port for the script to listen on.\n  For your security, ensure the port is *NOT FORWARDED* in your router.\n  (If you don't know what anything means, you should probably leave it at \"6000\".)\n\n\n- Master Port: The port for Torch to communicate on.\n  Default value of 29400 is usually okay, change it if it conflicts with anything.\n  For your security, ensure the port is *NOT FORWARDED* in your router.\n  (If you don't know what anything means, you should probably leave it at \"29400\".)\n\n\n- Backend: Choose the backend to run.\n  AsyncDiff: Generally the fastest, but at the cost of quality.\n  Balanced: Spreads pipeline components between GPUs (effectively like combining VRAM).\n  Single: Runs Diffusers on 1 GPU, very useful for offloading-oriented workflows.\n\n\n- cuda_visible_devices: Sets which GPUs are visible to the script.\n  For example, let's say you have a 4-GPU setup, but you only want to use the first two:\n  \"0,1\"\n   Or, if you want to use the last two:\n  \"2,3\"\n  (If you don't know what anything means, you should probably leave it blank.)\n\n\n- transformers_version: \"5\" is required for Krea2 model, otherwise use whichever.\n\n\n- s33d: Re-creates the host if it is changed between runs.\n  If you don't change it, it tries to reuse the host that is already initialized.\n  If you change the backend, you must close the host.\n  This can be done manually by using the command \"curl localhost:{port}/close\" in your terminal."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 31,
+      "type": "Note",
+      "pos": [
+        -625,
+        325
+      ],
+      "size": [
+        750,
+        500
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "This configures the backend that you have selected.\nEach backend has its own corresponding backend config.\nFor example, here is an AsyncDiffConfig.\n\n\nParameters:\n\n\n- model_n: How many parts to split the model into.\n  (Usually, setting this to the number of GPUs in your machine will provide best results.)\n\n\n- stride: How often should steps be skipped (by using cache).\n  Value of 1 means disabled (no skipping by cache).\n  Value of 2 means skip every other step, value of 3 means skip every 3rd step, and so on.\n  (The less you skip steps, the better the result.)\n\n\n- synced_steps: How many steps should be done normally until the caching mechanisms kick in.\n  (Higher number of synced_steps will yield better results, but less room for speedup.)\n\n\n- time_shift: Moves the timesteps back, as if you had more noise in your latent than actual.\n  With some models, this helps with faster convergence.\n  With other models, this makes image quality worse.\n  time_shift may make you lose some amount of fine detail with the end result.\n  (Experiment and FAFO, or just leave it off.)\n\n\n- shifted_steps: How many steps to do time_shift for.\n\n\n- ramped_time_shift: Tries to mitigate detail-loss when using time_shift by ramping down time_shift over shifted_steps.\n  For example, if you have 10 steps, and your time_shift is 5, enabling this would make time_shift:\n  [5, 5, 4, 4, 3, 3, 2, 2, 1, 1] = 10 steps"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 35,
+      "type": "Note",
+      "pos": [
+        -525,
+        1575
+      ],
+      "size": [
+        650,
+        225
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "Diffusers allows for various pipeline quantization techniques.\n\n\nThis node here is for a SDNQ configuration.\nI strongly encourage you to check out the SDNQ GitHub for proper usage, and to support the dev:\n- https://github.com/Disty0/sdnq\n\n\nSimply put, this here will quantize the model to 4 bits.\n\n\nThere are other nodes for quantization as well. Refer to this for help:\n- https://huggingface.co/docs/diffusers/quantization/overview"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 36,
+      "type": "Note",
+      "pos": [
+        -525,
+        2075
+      ],
+      "size": [
+        575,
+        150
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "You can mix-and-match quantization methods as you see fit.\nFor example, you could use BitsAndBytes for the transformer, and SDNQ for the encoders.\nSpeed also varies between the quantization methods, so experiment and FAFO is required.\n\n\nI will just 4-bit quantize everything (except VAE) for the sake of demonstration.\nFor best results, only quantize the bare minimum to fit the model onto the GPUs."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 37,
+      "type": "Note",
+      "pos": [
+        700,
+        675
+      ],
+      "size": [
+        625,
+        400
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "This nifty node helps you put everything together into an useable host for your sampler.\n\n\nRequired:\n- host (from CreateHost)\n- backend_config (from AsyncDiffConfig, BalancedConfig, SingleConfig, etc.)\n- checkpoint (from CheckpointSelector)\n\n\nYou will also need to check the parameters at the bottom, most notably:\n\n\n- pipeline_type: The type of model.\n\n\n- infer_dtype: What dtype to run inference in\n  (If you are on Ampere (RTX 3xxx) or newer, you should be using BF16.)\n\n\n- weight_dtype: What dtype to store weights in\n  (If you are on Ampere (RTX 3xxx) or newer, you should be using BF16.)\n\n\n- vae_fp16: If true, run VAE in FP16.\n  (This should be disabled for sd1, sd2, sdxl, etc. unless you have a VAE that works in FP16.)"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 38,
+      "type": "Note",
+      "pos": [
+        1850,
+        700
+      ],
+      "size": [
+        525,
+        100
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "This is the \"sampling\" node.\n\n\n(Well, it just calls pipe(**kwargs), it doesn't do any actual sampling, lol.)"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 40,
+      "type": "Note",
+      "pos": [
+        1775,
+        175
+      ],
+      "size": [
+        675,
+        150
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "This node allows you to set (most) parameters in a given scheduler.\nHere we have a flow-match Euler scheduler, for use with flow-match models.\nIf you are using older models, you're probably looking for regular Euler, etc.\n\n\nWith all the different scheduler configurations, it is probably wise that you do your own homework here:\n- https://huggingface.co/docs/diffusers/api/schedulers/overview"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 41,
+      "type": "Note",
+      "pos": [
+        2850,
+        700
+      ],
+      "size": [
+        700,
+        150
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "This node closes the host when it receives an object.\nIn this case, your final image.\n\n\nUsually, you do not need to use this node, nor should you have to close the host after every output.\nBut, for the sake of demonstration (and testing), this is included here.\nIf you know everything works, you should remove this node, and reuse the host between runs when possible."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    }
+  ],
+  "links": [
+    [
+      4,
+      15,
+      0,
+      5,
+      0,
+      "MD_HOST"
+    ],
+    [
+      5,
+      16,
+      0,
+      5,
+      1,
+      "MD_BACKEND_CONFIG"
+    ],
+    [
+      6,
+      6,
+      0,
+      5,
+      2,
+      "MD_MODEL"
+    ],
+    [
+      13,
+      8,
+      0,
+      9,
+      0,
+      "IMAGE"
+    ],
+    [
+      37,
+      24,
+      0,
+      15,
+      1,
+      "INT"
+    ],
+    [
+      40,
+      25,
+      0,
+      5,
+      12,
+      "MD_QUANT_CONFIG"
+    ],
+    [
+      54,
+      5,
+      0,
+      43,
+      0,
+      "MD_HOST"
+    ],
+    [
+      55,
+      43,
+      0,
+      8,
+      0,
+      "MD_HOST"
+    ],
+    [
+      56,
+      43,
+      1,
+      8,
+      1,
+      "*"
+    ],
+    [
+      57,
+      39,
+      0,
+      43,
+      2,
+      "MD_FM_SCHEDULER"
+    ],
+    [
+      64,
+      49,
+      0,
+      25,
+      0,
+      "MD_MODEL_QUANT_CONFIG"
+    ],
+    [
+      65,
+      49,
+      0,
+      25,
+      1,
+      "MD_MODEL_QUANT_CONFIG"
+    ],
+    [
+      67,
+      49,
+      0,
+      25,
+      3,
+      "MD_MODEL_QUANT_CONFIG"
+    ],
+    [
+      68,
+      49,
+      0,
+      25,
+      4,
+      "MD_MODEL_QUANT_CONFIG"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "Create the host",
+      "bounding": [
+        -975,
+        -425,
+        975,
+        650
+      ],
+      "color": "#b06634",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "Backend configuration",
+      "bounding": [
+        -975,
+        250,
+        1125,
+        600
+      ],
+      "color": "#b06634",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "Checkpoint",
+      "bounding": [
+        -975,
+        875,
+        925,
+        575
+      ],
+      "color": "#b06634",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "Quantization",
+      "bounding": [
+        -975,
+        1475,
+        1125,
+        775
+      ],
+      "color": "#b06634",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 5,
+      "title": "Applying the pipeline",
+      "bounding": [
+        350,
+        600,
+        1000,
+        675
+      ],
+      "color": "#b58b2a",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 6,
+      "title": "Sampler",
+      "bounding": [
+        1400,
+        600,
+        1000,
+        475
+      ],
+      "color": "#88A",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 7,
+      "title": "Scheduler",
+      "bounding": [
+        1400,
+        75,
+        1075,
+        500
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 8,
+      "title": "Closing the host",
+      "bounding": [
+        2525,
+        600,
+        1050,
+        275
+      ],
+      "color": "#A88",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 11,
+      "title": "Read me",
+      "bounding": [
+        -2500,
+        175,
+        975,
+        975
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 9,
+      "title": "Read me",
+      "bounding": [
+        -2375,
+        275,
+        750,
+        750
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 10,
+      "title": "Read me",
+      "bounding": [
+        -2275,
+        425,
+        550,
+        450
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.22295121976097615,
+      "offset": [
+        2866.7570794242124,
+        1392.2533069413787
+      ]
+    },
+    "frontendVersion": "1.16.9"
+  },
+  "version": 0.4
+}
