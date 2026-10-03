@@ -6,6 +6,7 @@ ComfyUI nodes to run [multigpu_diffusion](https://github.com/SlackinJack/multigp
 
 
 ![Screenshot 1](/.gallery/workflow_example.png?raw=true "Screenshot 1")
+![Screenrecording 1](/.gallery/demo.gif?raw=true "Screenrecording 1")
 
 
 ## Notes:
